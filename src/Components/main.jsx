@@ -1,12 +1,15 @@
 import React from 'react';
+import Header from './headerComponents/header';
+import Body from './bodyComponents/body';
 
-function main(props) {
+function Main(props) {
     return (
-        <div>
-            
+        <div className='main'>
+            <Header></Header>
+            <Body></Body>
         </div>
     )
 }
 
-export default main;
+export default Main;
 
