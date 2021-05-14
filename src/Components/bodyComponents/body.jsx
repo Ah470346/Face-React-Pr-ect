@@ -1,5 +1,5 @@
 import React, {useState ,useEffect ,useRef} from 'react';
-import { Button } from 'antd';
+import { Button ,notification} from 'antd';
 import '@tensorflow/tfjs';
 import * as canvas from 'canvas';
 
@@ -52,8 +52,6 @@ function Body(props) {
         
     }
     const streamCamVideo = (video) => {
-        setOpenCamVideo(true);
-        setRecognition(true);
         const constraints = {audio: false , video : true};
         navigator.mediaDevices
         .getUserMedia(constraints)
@@ -62,9 +60,19 @@ function Body(props) {
             video.current.onloadedmetadata = function(e) {
                 video.current.play();
             };
+            setOpenCamVideo(true);
+            setRecognition(true);
           })
           .catch(function(err) {
             console.log(err.name + ": " + err.message);
+            if(err.name === "NotFoundError"){
+                notification.error({
+                    message: 'Không tìm thấy thiết bị !!!',
+                    description:
+                      'Máy tính của bạn có thể không hỗ trợ webCam, chúng tôi không tìm thấy thiết bị',
+                });
+            }
+            
           }); // always check for errors at the end.
     }
     const stop = (video) => {
@@ -76,6 +84,7 @@ function Body(props) {
         });
 
         video.current.srcObject = null;
+        
         setOpenCamVideo(false);
         setRecognition(false);
     }
