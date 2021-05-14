@@ -15,10 +15,11 @@
 
         & .wrap-button {
             @include flexBox(row,space-around,center);
-
+            padding: 0 70px 0 70px;
             & .wrap-input {
                 position: relative;
                 @include flexBox(column,center,center);
+
 
                 & label {
                     width: 220px;
