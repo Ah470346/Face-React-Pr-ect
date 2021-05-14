@@ -56,12 +56,12 @@ function Body(props) {
         navigator.mediaDevices
         .getUserMedia(constraints)
         .then(function(mediaStream) {
+            setOpenCamVideo(true);
+            setRecognition(true);
             video.current.srcObject = mediaStream;
             video.current.onloadedmetadata = function(e) {
                 video.current.play();
             };
-            setOpenCamVideo(true);
-            setRecognition(true);
           })
           .catch(function(err) {
             console.log(err.name + ": " + err.message);
@@ -70,6 +70,12 @@ function Body(props) {
                     message: 'Không tìm thấy thiết bị !!!',
                     description:
                       'Máy tính của bạn có thể không hỗ trợ webCam, chúng tôi không tìm thấy thiết bị',
+                });
+            } else if(err.name === "NotAllowedError"){
+                notification.error({
+                    message: 'Không được cấp phép truy cập !!!',
+                    description:
+                      'Hãy cấp phép cho website truy cập vào thiết bị của bạn!',
                 });
             }
             
