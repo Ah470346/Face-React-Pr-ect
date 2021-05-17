@@ -3,7 +3,7 @@ import { Button ,notification,Tooltip,Spin} from 'antd';
 import * as faceapi from 'face-api.js';
 
 
-function InputFile({setDataTrain,dataTrain}) {
+function InputFile({setDataTrain}) {
     const [train, setTrain] = useState(false);
     const [success, setSuccess] = useState("");
     const [trainLoading, setTrainLoading] = useState("Train");
@@ -124,39 +124,11 @@ function InputFile({setDataTrain,dataTrain}) {
         setSpin(true);
         setTrainLoading("Training....");
         setSuccess("");
-        Promise.all([
-            faceapi.nets.faceLandmark68Net.load('/models'),
-            faceapi.nets.ssdMobilenetv1.load('/models'),
-            faceapi.nets.faceRecognitionNet.load('/models'),
-        ]).then(async ()=>{
-            const result = [];
-            const faceDetectPromise =  await handleTrainImages();
-            for(let i of faceDetectPromise[0]){
-                let a = await i ; 
-                result.push({label: a.label, faceDetects: a.faceDetects});
-            }
-            if(result.length === faceDetectPromise[0].length){
-                setSpin(false);
-                notification.success({
-                    message: 'Train thành công !!!',
-                    description:
-                        'Quá trình train hoàn tất !',
-                });
-                setTrain(false);
-                setTrainLoading('Train');
-                setDataTrain(result);
-            }
-        }).catch((err)=>{
-            notification.error({
-                message: 'Các gói nhận diên chưa được tải !!!',
-                description:
-                  `Xin kiểm tra lại kết nối mạng hoặc có thể web đang trong quá 
-                  trình tải các gói nhận diện, xin thử lại sau!`,
-            });
-            setTrain(false);
-            setTrainLoading('Train');
-        });
-        // const handel = async ()=>{
+        // Promise.all([
+        //     faceapi.nets.faceLandmark68Net.load('/models'),
+        //     faceapi.nets.ssdMobilenetv1.load('/models'),
+        //     faceapi.nets.faceRecognitionNet.load('/models'),
+        // ]).then(async ()=>{
         //     const result = [];
         //     const faceDetectPromise =  await handleTrainImages();
         //     for(let i of faceDetectPromise[0]){
@@ -174,8 +146,36 @@ function InputFile({setDataTrain,dataTrain}) {
         //         setTrainLoading('Train');
         //         setDataTrain(result);
         //     }
-        // }
-        // handel();
+        // }).catch((err)=>{
+        //     notification.error({
+        //         message: 'Các gói nhận diên chưa được tải !!!',
+        //         description:
+        //           `Xin kiểm tra lại kết nối mạng hoặc có thể web đang trong quá 
+        //           trình tải các gói nhận diện, xin thử lại sau!`,
+        //     });
+        //     setTrain(false);
+        //     setTrainLoading('Train');
+        // });
+        const handel = async ()=>{
+            const result = [];
+            const faceDetectPromise =  await handleTrainImages();
+            for(let i of faceDetectPromise[0]){
+                let a = await i ; 
+                result.push({label: a.label, faceDetects: a.faceDetects});
+            }
+            if(result.length === faceDetectPromise[0].length){
+                setSpin(false);
+                notification.success({
+                    message: 'Train thành công !!!',
+                    description:
+                        'Quá trình train hoàn tất !',
+                });
+                setTrain(false);
+                setTrainLoading('Train');
+                setDataTrain(result);
+            }
+        }
+        handel();
     }
     return (
         <div className='wrap-input'>
@@ -190,7 +190,9 @@ function InputFile({setDataTrain,dataTrain}) {
                 </>
                 : <>
                     <Spin spinning={spin} className='spin'>
-                        <Button onClick={handleTrain} type="primary">{trainLoading}</Button>
+                        <Tooltip  placement="top" title='*Lưu ý: Tên folder chứa ảnh sẽ được lấy làm tên nhận diện khuôn mặt!'>
+                            <Button onClick={handleTrain} type="primary">{trainLoading}</Button>
+                        </Tooltip> 
                     </Spin>
                         <p>{success}</p>
                 </> 

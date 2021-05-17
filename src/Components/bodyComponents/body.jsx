@@ -1,5 +1,5 @@
 import React, {useState  ,useRef,useEffect} from 'react';
-import { Button ,notification} from 'antd';
+import { Button ,notification,Spin} from 'antd';
 // import '@tensorflow/tfjs';
 import * as canvas from 'canvas';
 
@@ -21,6 +21,7 @@ faceapi.env.monkeyPatch ({
 
     
 function Body(props) {
+    const [loadModels, setLoadModels] = useState(true);
     const [openCamVideo, setOpenCamVideo] = useState(false);
     const [recognition, setRecognition] = useState(false);
     const [faceDescriptions, setFaceDescription] = useState([]) ;
@@ -28,11 +29,23 @@ function Body(props) {
 
     console.log(faceDescriptions);
 
+    const labeledDescriptors = (descriptions) => {
+        return descriptions.map(async(description)=>{
+            let face = await faceapi.LabeledFaceDescriptors(description.label, description.faceDetects);
+            return face;
+        })
+    }
+
     const handlePlay = (vd) =>{
         const video = document.getElementById('video');
         const wrapVideo = document.getElementById('wrap-video');
         const canvas = faceapi.createCanvasFromMedia(video);
         wrapVideo.appendChild(canvas);
+
+        console.log(labeledDescriptors(faceDescriptions));
+
+        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions))
+
         const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
         faceapi.matchDimensions(canvas,displaySize);
         setInterval(async()=>{
@@ -40,14 +53,12 @@ function Body(props) {
                 new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks();
             const resizeDetections = faceapi.resizeResults(detections,displaySize);
+            const result = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
+
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
-            // resizeDetections.forEach(detection => {
-            //     const box = detection.detection.box;
-            //     const drawBox= 
-            // })
             faceapi.draw.drawDetections(canvas,resizeDetections);
-            faceapi.draw.drawFaceLandmarks(canvas,resizeDetections);
-        },100);
+        },50);
+
     }
 
 
@@ -97,17 +108,20 @@ function Body(props) {
         setRecognition(false);
     }
 
+
     useEffect(()=>{
-        // const fetchModels = async () =>{
-        //     await faceapi.nets.faceLandmark68Net.load('/models');
-        //     await faceapi.nets.ssdMobilenetv1.load('/models');
-        //     await faceapi.nets.tinyFaceDetector.load('/models');
-        //     await faceapi.nets.faceRecognitionNet.load('/models');
-        //     await faceapi.nets.faceExpressionNet.load('/models');
-        // } 
-        // fetchModels().catch((err)=>console.log("error load models"));
+        const fetchModels = async () =>{
+            await faceapi.nets.faceLandmark68Net.load('/models');
+            await faceapi.nets.ssdMobilenetv1.load('/models');
+            await faceapi.nets.tinyFaceDetector.load('/models');
+            await faceapi.nets.faceRecognitionNet.load('/models');
+        } 
+        fetchModels().then(()=>{
+            setLoadModels(false);
+        });
     },[])
     return (
+        <Spin spinning={loadModels} className='spin-body' tip='Loading models...'>
         <div className="wrap-body">
             <div className='wrap-recognition container'>
                 <div className='wrap-button'>
@@ -120,7 +134,7 @@ function Body(props) {
                 <div id="wrap-video" className='wrap-video'>
                     { openCamVideo === true ? (
                     <>
-                        <video id="video" onPlay={()=>handlePlay(elVideo)} ref={elVideo}></video>
+                        <video width="720" height="560" id="video" onPlay={()=>handlePlay(elVideo)} ref={elVideo}></video>
                     </>
                     )
                     :
@@ -134,6 +148,7 @@ function Body(props) {
                 </div>
             </div>
         </div>
+        </Spin>
     )
 }
 
