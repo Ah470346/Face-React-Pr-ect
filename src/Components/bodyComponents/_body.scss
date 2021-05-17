@@ -54,12 +54,16 @@
         }
 
         & .wrap-video {
+            position: relative;
             margin: 50px 60px 10px 60px;
             padding: 5px;
             height: 500px;
             border: 1px solid rgba($color: #000000, $alpha: 0.1);
             @include flexBox(row,center,center);
 
+            & canvas {
+                position: absolute;
+            }
             & video {
                 width: 100%;
                 height: 100%;

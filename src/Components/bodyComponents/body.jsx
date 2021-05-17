@@ -1,4 +1,4 @@
-import React, {useState  ,useRef} from 'react';
+import React, {useState  ,useRef,useEffect} from 'react';
 import { Button ,notification} from 'antd';
 // import '@tensorflow/tfjs';
 import * as canvas from 'canvas';
@@ -28,8 +28,26 @@ function Body(props) {
 
     console.log(faceDescriptions);
 
-    const handlePlay = () =>{
-        console.log("hello");
+    const handlePlay = (vd) =>{
+        const video = document.getElementById('video');
+        const wrapVideo = document.getElementById('wrap-video');
+        const canvas = faceapi.createCanvasFromMedia(video);
+        wrapVideo.appendChild(canvas);
+        const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
+        faceapi.matchDimensions(canvas,displaySize);
+        setInterval(async()=>{
+            const detections = await faceapi.detectAllFaces(video,
+                new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks();
+            const resizeDetections = faceapi.resizeResults(detections,displaySize);
+            canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
+            // resizeDetections.forEach(detection => {
+            //     const box = detection.detection.box;
+            //     const drawBox= 
+            // })
+            faceapi.draw.drawDetections(canvas,resizeDetections);
+            faceapi.draw.drawFaceLandmarks(canvas,resizeDetections);
+        },100);
     }
 
 
@@ -66,7 +84,9 @@ function Body(props) {
     const stop = (video) => {
         const stream = video.current.srcObject;
         const tracks = stream.getTracks();
-
+        const canvas = document.getElementsByTagName('canvas');
+        const wrapVideo = document.getElementById('wrap-video');
+        wrapVideo.removeChild(canvas[0])
         tracks.forEach(function(track) {
             track.stop();
         });
@@ -76,6 +96,17 @@ function Body(props) {
         setOpenCamVideo(false);
         setRecognition(false);
     }
+
+    useEffect(()=>{
+        // const fetchModels = async () =>{
+        //     await faceapi.nets.faceLandmark68Net.load('/models');
+        //     await faceapi.nets.ssdMobilenetv1.load('/models');
+        //     await faceapi.nets.tinyFaceDetector.load('/models');
+        //     await faceapi.nets.faceRecognitionNet.load('/models');
+        //     await faceapi.nets.faceExpressionNet.load('/models');
+        // } 
+        // fetchModels().catch((err)=>console.log("error load models"));
+    },[])
     return (
         <div className="wrap-body">
             <div className='wrap-recognition container'>
@@ -86,8 +117,12 @@ function Body(props) {
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)
                     }   
                 </div>
-                <div className='wrap-video'>
-                    { openCamVideo === true ? (<video onPlay={handlePlay} ref={elVideo}></video>)
+                <div id="wrap-video" className='wrap-video'>
+                    { openCamVideo === true ? (
+                    <>
+                        <video id="video" onPlay={()=>handlePlay(elVideo)} ref={elVideo}></video>
+                    </>
+                    )
                     :
                     (<div className='signal'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" className="bi bi-play-circle" viewBox="0 0 16 16">

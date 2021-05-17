@@ -108,7 +108,9 @@ function InputFile({setDataTrain,dataTrain}) {
                     const img = await i;
                     const a = document.createElement('img');
                     a.src = img;
-                    const detections = await faceapi.detectSingleFace(a).withFaceLandmarks().withFaceDescriptor();
+                    const detections = await faceapi.detectSingleFace(a)
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
                     if(detections.descriptor){
                         descriptions.push(detections.descriptor);
                     }   
@@ -118,17 +120,15 @@ function InputFile({setDataTrain,dataTrain}) {
         ]);
     }
     //----------------------------------call train images when download face-api and set dataDetects
-    const handleTrain = ()=>{
+    const handleTrain = () =>{
+        setSpin(true);
         setTrainLoading("Training....");
         setSuccess("");
-        setSpin(true);
         Promise.all([
             faceapi.nets.faceLandmark68Net.load('/models'),
             faceapi.nets.ssdMobilenetv1.load('/models'),
-            faceapi.nets.tinyFaceDetector.load('/models'),
             faceapi.nets.faceRecognitionNet.load('/models'),
-            faceapi.nets.faceExpressionNet.load('/models'),
-        ]).then(async () => {
+        ]).then(async ()=>{
             const result = [];
             const faceDetectPromise =  await handleTrainImages();
             for(let i of faceDetectPromise[0]){
@@ -140,13 +140,42 @@ function InputFile({setDataTrain,dataTrain}) {
                 notification.success({
                     message: 'Train thành công !!!',
                     description:
-                      'Quá trình train hoàn tất !',
+                        'Quá trình train hoàn tất !',
                 });
                 setTrain(false);
                 setTrainLoading('Train');
-                setDataTrain(result)
+                setDataTrain(result);
             }
+        }).catch((err)=>{
+            notification.error({
+                message: 'Các gói nhận diên chưa được tải !!!',
+                description:
+                  `Xin kiểm tra lại kết nối mạng hoặc có thể web đang trong quá 
+                  trình tải các gói nhận diện, xin thử lại sau!`,
+            });
+            setTrain(false);
+            setTrainLoading('Train');
         });
+        // const handel = async ()=>{
+        //     const result = [];
+        //     const faceDetectPromise =  await handleTrainImages();
+        //     for(let i of faceDetectPromise[0]){
+        //         let a = await i ; 
+        //         result.push({label: a.label, faceDetects: a.faceDetects});
+        //     }
+        //     if(result.length === faceDetectPromise[0].length){
+        //         setSpin(false);
+        //         notification.success({
+        //             message: 'Train thành công !!!',
+        //             description:
+        //                 'Quá trình train hoàn tất !',
+        //         });
+        //         setTrain(false);
+        //         setTrainLoading('Train');
+        //         setDataTrain(result);
+        //     }
+        // }
+        // handel();
     }
     return (
         <div className='wrap-input'>
