@@ -30,8 +30,8 @@ function Body(props) {
     console.log(faceDescriptions);
 
     const labeledDescriptors = (descriptions) => {
-        return descriptions.map(async(description)=>{
-            let face = await faceapi.LabeledFaceDescriptors(description.label, description.faceDetects);
+        return descriptions.map((description)=>{
+            let face = new faceapi.LabeledFaceDescriptors(description.label, description.faceDetects);
             return face;
         })
     }
@@ -42,22 +42,27 @@ function Body(props) {
         const canvas = faceapi.createCanvasFromMedia(video);
         wrapVideo.appendChild(canvas);
 
-        console.log(labeledDescriptors(faceDescriptions));
-
-        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions))
+        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
 
         const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
         faceapi.matchDimensions(canvas,displaySize);
         setInterval(async()=>{
+            
             const detections = await faceapi.detectAllFaces(video,
                 new faceapi.TinyFaceDetectorOptions())
-                .withFaceLandmarks();
+                .withFaceLandmarks().withFaceDescriptors();
             const resizeDetections = faceapi.resizeResults(detections,displaySize);
-            const result = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
 
+            const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
-            faceapi.draw.drawDetections(canvas,resizeDetections);
-        },50);
+            results.forEach((r,i)=>{
+                const box = resizeDetections[i].detection.box;
+                const drawBox = new faceapi.draw.DrawBox(box,{label: r.toString()});
+                drawBox.draw(canvas);
+            })
+            
+            
+        },100);
 
     }
 
