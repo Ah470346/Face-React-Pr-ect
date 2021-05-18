@@ -1,6 +1,8 @@
 import React , {useState,useRef} from 'react';
 import { Button ,notification,Tooltip,Spin} from 'antd';
 import * as faceapi from 'face-api.js';
+import shortID from 'shortid';
+import recognitionApi from '../../api/recognitionApi';
 
 
 function InputFile({setDataTrain}) {
@@ -124,44 +126,14 @@ function InputFile({setDataTrain}) {
         setSpin(true);
         setTrainLoading("Training....");
         setSuccess("");
-        // Promise.all([
-        //     faceapi.nets.faceLandmark68Net.load('/models'),
-        //     faceapi.nets.ssdMobilenetv1.load('/models'),
-        //     faceapi.nets.faceRecognitionNet.load('/models'),
-        // ]).then(async ()=>{
-        //     const result = [];
-        //     const faceDetectPromise =  await handleTrainImages();
-        //     for(let i of faceDetectPromise[0]){
-        //         let a = await i ; 
-        //         result.push({label: a.label, faceDetects: a.faceDetects});
-        //     }
-        //     if(result.length === faceDetectPromise[0].length){
-        //         setSpin(false);
-        //         notification.success({
-        //             message: 'Train thành công !!!',
-        //             description:
-        //                 'Quá trình train hoàn tất !',
-        //         });
-        //         setTrain(false);
-        //         setTrainLoading('Train');
-        //         setDataTrain(result);
-        //     }
-        // }).catch((err)=>{
-        //     notification.error({
-        //         message: 'Các gói nhận diên chưa được tải !!!',
-        //         description:
-        //           `Xin kiểm tra lại kết nối mạng hoặc có thể web đang trong quá 
-        //           trình tải các gói nhận diện, xin thử lại sau!`,
-        //     });
-        //     setTrain(false);
-        //     setTrainLoading('Train');
-        // });
         const handel = async ()=>{
             const result = [];
             const faceDetectPromise =  await handleTrainImages();
             for(let i of faceDetectPromise[0]){
                 let a = await i ; 
-                result.push({label: a.label, faceDetects: a.faceDetects});
+                result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
+                //post face recognition to server
+                // await recognitionApi.postRecognition({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
             }
             if(result.length === faceDetectPromise[0].length){
                 setSpin(false);

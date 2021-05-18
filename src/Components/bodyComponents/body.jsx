@@ -4,8 +4,7 @@ import { Button ,notification,Spin} from 'antd';
 import * as canvas from 'canvas';
 
 import * as faceapi from 'face-api.js';
-
-
+import recognitionApi from '../../api/recognitionApi';
 import InputFile from './InputFile';
 
 
@@ -53,10 +52,19 @@ function Body(props) {
                 .withFaceLandmarks().withFaceDescriptors();
             const resizeDetections = faceapi.resizeResults(detections,displaySize);
 
-            console.log(resizeDetections);
+            // console.log(resizeDetections);
+
+            const boxResize = (resizeDetections)=>{
+                if(resizeDetections[0] === undefined){
+                    return [];
+                } else {
+                    console.log(resizeDetections[0].alignedRect._box);
+                    return resizeDetections[0].alignedRect._box;
+                }
+            }
 
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
-            faceapi.draw.drawDetections(canvas,resizeDetections);
+            faceapi.draw.drawDetections(canvas,boxResize(resizeDetections));
 
             // const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
             // canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
@@ -120,6 +128,21 @@ function Body(props) {
 
 
     useEffect(()=>{
+        const fetchRecognition = async ()=>{
+            try {
+                const response = await recognitionApi.getAll();
+                const result = response.map((l)=>{
+                    const a = l.faceDetects.map((f)=>{
+                        return parseFloat(f);
+                    })
+                    return {...l,faceDetects: Float32Array.from(a)};
+                })
+                console.log(result);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchRecognition();
         const fetchModels = async () =>{
             await faceapi.nets.faceLandmark68Net.load('/models');
             await faceapi.nets.ssdMobilenetv1.load('/models');

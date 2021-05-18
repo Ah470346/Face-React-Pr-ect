@@ -9,12 +9,15 @@
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
     "antd": "^4.15.4",
+    "axios": "^0.21.1",
     "bootstrap": "^5.0.0",
     "canvas": "^2.7.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^9.0.2",
     "face-api.js": "^0.22.2",
     "node": "^16.1.0",
     "node-sass": "^6.0.0",
+    "query-string": "^7.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",
@@ -22,6 +25,7 @@
     "reactstrap": "^8.9.0",
     "redux": "^4.1.0",
     "sass": "^1.32.12",
+    "shortid": "^2.2.16",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
