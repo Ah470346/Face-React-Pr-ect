@@ -42,7 +42,7 @@ function Body(props) {
         const canvas = faceapi.createCanvasFromMedia(video);
         wrapVideo.appendChild(canvas);
 
-        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+        // const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
 
         const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
         faceapi.matchDimensions(canvas,displaySize);
@@ -53,16 +53,21 @@ function Body(props) {
                 .withFaceLandmarks().withFaceDescriptors();
             const resizeDetections = faceapi.resizeResults(detections,displaySize);
 
-            const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+            console.log(resizeDetections);
+
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
-            results.forEach((r,i)=>{
-                const box = resizeDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box,{label: r.toString()});
-                drawBox.draw(canvas);
-            })
+            faceapi.draw.drawDetections(canvas,resizeDetections);
+
+            // const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+            // canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
+            // results.forEach((r,i)=>{
+            //     const box = resizeDetections[i].detection.box;
+            //     const drawBox = new faceapi.draw.DrawBox(box,{label: r.toString()});
+            //     drawBox.draw(canvas);
+            // })
             
             
-        },100);
+        },200);
 
     }
 
