@@ -23,10 +23,10 @@ function Body(props) {
     const [loadModels, setLoadModels] = useState(true);
     const [openCamVideo, setOpenCamVideo] = useState(false);
     const [recognition, setRecognition] = useState(false);
-    const [faceDescriptions, setFaceDescription] = useState([]) ;
+    const [faceDescriptions, setFaceDescription] = useState();
+    const [reload,setReload] = useState(false);
+    const [replay,setReplay] = useState(false);
     const elVideo = useRef();
-
-    console.log(faceDescriptions);
 
     const labeledDescriptors = (descriptions) => {
         return descriptions.map((description)=>{
@@ -38,10 +38,21 @@ function Body(props) {
     const handlePlay = (vd) =>{
         const video = document.getElementById('video');
         const wrapVideo = document.getElementById('wrap-video');
+        const CurrentCanvas = document.getElementsByTagName('canvas');
         const canvas = faceapi.createCanvasFromMedia(video);
-        wrapVideo.appendChild(canvas);
+        if(CurrentCanvas.length !== 0){
+            wrapVideo.replaceChild(canvas,CurrentCanvas[0]);
+        } else{
+            wrapVideo.appendChild(canvas);
+        }
+        
+        
 
-        // const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+        let faceMatcher = [];
+        if(faceDescriptions.length !== 0){
+            faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+        }
+        
 
         const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
         faceapi.matchDimensions(canvas,displaySize);
@@ -52,8 +63,7 @@ function Body(props) {
                 .withFaceLandmarks().withFaceDescriptors();
             const resizeDetections = faceapi.resizeResults(detections,displaySize);
 
-            // console.log(resizeDetections);
-
+            // draw canvas by boxResize
             const boxResize = (resizeDetections)=>{
                 if(resizeDetections[0] === undefined){
                     return [];
@@ -62,23 +72,26 @@ function Body(props) {
                     return resizeDetections[0].alignedRect._box;
                 }
             }
-
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
-            faceapi.draw.drawDetections(canvas,boxResize(resizeDetections));
-
-            // const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
-            // canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
-            // results.forEach((r,i)=>{
-            //     const box = resizeDetections[i].detection.box;
-            //     const drawBox = new faceapi.draw.DrawBox(box,{label: r.toString()});
-            //     drawBox.draw(canvas);
-            // })
-            
-            
+            if(faceMatcher.length === 0){
+                faceapi.draw.drawDetections(canvas,resizeDetections);
+            } else if(faceMatcher.length !== 0){
+                const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+                canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
+                results.forEach((r,i)=>{
+                    const box = resizeDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box,{label: r.toString()});
+                    drawBox.draw(canvas);
+                })
+            }
         },200);
 
     }
-
+    // replay canvas when update train
+    if(faceDescriptions!== undefined && faceDescriptions.length!==0 && replay ===true){
+        handlePlay(elVideo);
+        setReplay(false);
+    }
 
     const streamCamVideo = (video) => {
         const constraints = {audio: false , video : true};
@@ -132,12 +145,13 @@ function Body(props) {
             try {
                 const response = await recognitionApi.getAll();
                 const result = response.map((l)=>{
-                    const a = l.faceDetects.map((f)=>{
-                        return parseFloat(f);
-                    })
-                    return {...l,faceDetects: Float32Array.from(a)};
+                    const array = []
+                    for (let i of l.faceDetects){
+                        array.push(Float32Array.from(i.map((e)=> parseFloat(e))));
+                    }
+                    return {...l,faceDetects: array};
                 })
-                console.log(result);
+                setFaceDescription(() => result);
             } catch (error) {
                 console.log(error);
             }
@@ -152,13 +166,13 @@ function Body(props) {
         fetchModels().then(()=>{
             setLoadModels(false);
         });
-    },[])
+    },[reload]);
     return (
         <Spin spinning={loadModels} className='spin-body' tip='Loading models...'>
         <div className="wrap-body">
             <div className='wrap-recognition container'>
                 <div className='wrap-button'>
-                    <InputFile setDataTrain={setFaceDescription} dataTrain={faceDescriptions}></InputFile>
+                    <InputFile setReplay={setReplay} setReload={setReload} reload={reload}></InputFile>
                     {recognition === false
                     ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Face Recognition</Button>)
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)

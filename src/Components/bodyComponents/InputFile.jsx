@@ -5,7 +5,7 @@ import shortID from 'shortid';
 import recognitionApi from '../../api/recognitionApi';
 
 
-function InputFile({setDataTrain}) {
+function InputFile({setReload,reload,setReplay}) {
     const [train, setTrain] = useState(false);
     const [success, setSuccess] = useState("");
     const [trainLoading, setTrainLoading] = useState("Train");
@@ -132,10 +132,18 @@ function InputFile({setDataTrain}) {
             for(let i of faceDetectPromise[0]){
                 let a = await i ; 
                 result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
-                //post face recognition to server
-                // await recognitionApi.postRecognition({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
             }
             if(result.length === faceDetectPromise[0].length){
+                // push data to server
+                for(let i = 0 ; i < result.length ; i++){
+                    let array = [];
+                    for(let e of result[i].faceDetects){
+                        array.push(Array.from(e).map(String));
+                    }
+                    await recognitionApi.postRecognition({...result[i],
+                        faceDetects: array})
+                }
+                //-----------------------------------------------------
                 setSpin(false);
                 notification.success({
                     message: 'Train thành công !!!',
@@ -144,7 +152,8 @@ function InputFile({setDataTrain}) {
                 });
                 setTrain(false);
                 setTrainLoading('Train');
-                setDataTrain(result);
+                setReload(!reload);
+                setReplay(true);
             }
         }
         handel();
