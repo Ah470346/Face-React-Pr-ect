@@ -89,8 +89,13 @@ function Body(props) {
     }
     // replay canvas when update train
     if(faceDescriptions!== undefined && faceDescriptions.length!==0 && replay ===true){
-        handlePlay(elVideo);
-        setReplay(false);
+        const CurrentVideo = document.getElementsByTagName('video');
+        console.log(CurrentVideo);
+        if(CurrentVideo.length !== 0){
+            console.log('hello');
+            handlePlay(elVideo);
+        }
+        setReplay(false); 
     }
 
     const streamCamVideo = (video) => {
@@ -181,7 +186,7 @@ function Body(props) {
                 <div id="wrap-video" className='wrap-video'>
                     { openCamVideo === true ? (
                     <>
-                        <video width="720" height="560" id="video" onPlay={()=>handlePlay(elVideo)} ref={elVideo}></video>
+                        <video width="720" height="560" id="video" onPlay={()=>{handlePlay(elVideo)}} ref={elVideo}></video>
                     </>
                     )
                     :
