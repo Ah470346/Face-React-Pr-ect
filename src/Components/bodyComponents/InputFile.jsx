@@ -3,6 +3,8 @@ import { Button ,notification,Tooltip,Spin} from 'antd';
 import * as faceapi from 'face-api.js';
 import shortID from 'shortid';
 import recognitionApi from '../../api/recognitionApi';
+import {useSelector} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 
 
 function InputFile({setReload,reload,setReplay}) {
@@ -11,6 +13,9 @@ function InputFile({setReload,reload,setReplay}) {
     const [trainLoading, setTrainLoading] = useState("Train");
     const [spin, setSpin] = useState(true);
     const [dataUpLoad , setDataUpLoad] = useState([]);
+
+    const history = useHistory();
+    const status = useSelector(state => state.status);
     //----------------------------------Convert image to base64
     function getBase64(file) {
         return new Promise((resolve, reject) => {
@@ -123,40 +128,47 @@ function InputFile({setReload,reload,setReplay}) {
     }
     //----------------------------------call train images when download face-api and set dataDetects
     const handleTrain = () =>{
-        setSpin(true);
-        setTrainLoading("Training....");
-        setSuccess("");
-        const handel = async ()=>{
-            const result = [];
-            const faceDetectPromise =  await handleTrainImages();
-            for(let i of faceDetectPromise[0]){
-                let a = await i ; 
-                result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
-            }
-            if(result.length === faceDetectPromise[0].length){
-                // push data to server
-                for(let i = 0 ; i < result.length ; i++){
-                    let array = [];
-                    for(let e of result[i].faceDetects){
-                        array.push(Array.from(e).map(String));
-                    }
-                    await recognitionApi.postRecognition({...result[i],
-                        faceDetects: array})
+        if(status.length <= 1){
+            notification.error({
+                message: 'Yêu cầu đăng nhập trước khi trainning !!!',
+            });
+            history.push('/login');
+        } else {
+            setSpin(true);
+            setTrainLoading("Training....");
+            setSuccess("");
+            const handle =  async ()=>{
+                const result = [];
+                const faceDetectPromise =  await handleTrainImages();
+                for(let i of faceDetectPromise[0]){
+                    let a = await i ; 
+                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
                 }
-                //-----------------------------------------------------
-                setSpin(false);
-                notification.success({
-                    message: 'Train thành công !!!',
-                    description:
-                        'Quá trình train hoàn tất !',
-                });
-                setTrain(false);
-                setTrainLoading('Train');
-                setReload(!reload);
-                setReplay(true);
+                if(result.length === faceDetectPromise[0].length){
+                    // push data to server
+                    for(let i = 0 ; i < result.length ; i++){
+                        let array = [];
+                        for(let e of result[i].faceDetects){
+                            array.push(Array.from(e).map(String));
+                        }
+                        await recognitionApi.postRecognition({...result[i],
+                            faceDetects: array})
+                    }
+                    //-----------------------------------------------------
+                    setSpin(false);
+                    notification.success({
+                        message: 'Train thành công !!!',
+                        description:
+                            'Quá trình train hoàn tất !',
+                    });
+                    setTrain(false);
+                    setTrainLoading('Train');
+                    setReload(!reload);
+                    setReplay(true);
+                }
             }
+            handle();
         }
-        handel();
     }
     return (
         <div className='wrap-input'>
@@ -172,7 +184,11 @@ function InputFile({setReload,reload,setReplay}) {
                 : <>
                     <Spin spinning={spin} className='spin'>
                         <Tooltip  placement="top" title='*Lưu ý: Tên folder chứa ảnh sẽ được lấy làm tên nhận diện khuôn mặt!'>
-                            <Button onClick={handleTrain} type="primary">{trainLoading}</Button>
+                            <Button 
+                                onClick={()=>{
+                                    handleTrain();
+                                }} 
+                                type="primary">{trainLoading}</Button>
                         </Tooltip> 
                     </Spin>
                         <p>{success}</p>

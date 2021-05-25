@@ -1,8 +1,8 @@
 import React, {useState  ,useRef,useEffect} from 'react';
 import { Button ,notification,Spin} from 'antd';
-// import '@tensorflow/tfjs';
 import * as canvas from 'canvas';
-
+// import '@tensorflow/tfjs-node';
+import {useSelector} from 'react-redux';
 import * as faceapi from 'face-api.js';
 import recognitionApi from '../../api/recognitionApi';
 import InputFile from './InputFile';
@@ -20,7 +20,7 @@ faceapi.env.monkeyPatch ({
 
     
 function Body(props) {
-    const [loadModels, setLoadModels] = useState(true);
+    const [loadModels, setLoadModels] = useState(false);
     const [openCamVideo, setOpenCamVideo] = useState(false);
     const [recognition, setRecognition] = useState(false);
     const [faceDescriptions, setFaceDescription] = useState();
@@ -28,11 +28,12 @@ function Body(props) {
     const [replay,setReplay] = useState(false);
     const elVideo = useRef();
 
+    console.log(faceDescriptions);
     const labeledDescriptors = (descriptions) => {
         return descriptions.map((description)=>{
             let face = new faceapi.LabeledFaceDescriptors(description.label, description.faceDetects);
             return face;
-        })
+        });
     }
 
     const handlePlay = (vd) =>{
@@ -52,7 +53,6 @@ function Body(props) {
         if(faceDescriptions.length !== 0){
             faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
         }
-        
 
         const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
         faceapi.matchDimensions(canvas,displaySize);
@@ -90,9 +90,7 @@ function Body(props) {
     // replay canvas when update train
     if(faceDescriptions!== undefined && faceDescriptions.length!==0 && replay ===true){
         const CurrentVideo = document.getElementsByTagName('video');
-        console.log(CurrentVideo);
         if(CurrentVideo.length !== 0){
-            console.log('hello');
             handlePlay(elVideo);
         }
         setReplay(false); 
@@ -162,15 +160,6 @@ function Body(props) {
             }
         }
         fetchRecognition();
-        const fetchModels = async () =>{
-            await faceapi.nets.faceLandmark68Net.load('/models');
-            await faceapi.nets.ssdMobilenetv1.load('/models');
-            await faceapi.nets.tinyFaceDetector.load('/models');
-            await faceapi.nets.faceRecognitionNet.load('/models');
-        } 
-        fetchModels().then(()=>{
-            setLoadModels(false);
-        });
     },[reload]);
     return (
         <Spin spinning={loadModels} className='spin-body' tip='Loading models...'>
