@@ -1,6 +1,6 @@
 import  {connect} from "react-redux";
 import Main from '../Components/main';
-import {userLogin,fetchUser,clearLogin} from '../Actions/actionCreators';
+import {userLogin,fetchUser,clearLogin,fetchFaceDetect} from '../Actions/actionCreators';
 
 const mapStateToProps = (state) =>({
     users: state.users,
@@ -10,7 +10,8 @@ const mapStateToProps = (state) =>({
 const mapActionToProps = (dispatch) =>({
     userLogin: (user) => dispatch(userLogin(user)),
     fetchUser: () => dispatch(fetchUser()),
-    clearLogin: () => dispatch(clearLogin())
+    clearLogin: () => dispatch(clearLogin()),
+    fetchFaceDetect: ()=> dispatch(fetchFaceDetect())
 });
 
 export default connect(mapStateToProps,mapActionToProps)(Main);

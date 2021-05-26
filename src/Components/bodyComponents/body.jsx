@@ -4,8 +4,8 @@ import * as canvas from 'canvas';
 // import '@tensorflow/tfjs-node';
 import {useSelector} from 'react-redux';
 import * as faceapi from 'face-api.js';
-import recognitionApi from '../../api/recognitionApi';
 import InputFile from './InputFile';
+import TrainStatus from './trainStatus';
 
 
 const { Canvas, Image, ImageData } = canvas
@@ -23,11 +23,12 @@ function Body(props) {
     const [loadModels, setLoadModels] = useState(false);
     const [openCamVideo, setOpenCamVideo] = useState(false);
     const [recognition, setRecognition] = useState(false);
-    const [faceDescriptions, setFaceDescription] = useState();
     const [reload,setReload] = useState(false);
     const [replay,setReplay] = useState(false);
+    const [showModal,setShowModal] = useState(false);
+    const [info,setInfo] = useState([]);
     const elVideo = useRef();
-
+    const faceDescriptions = useSelector(state => state.faceDetect);
     console.log(faceDescriptions);
     const labeledDescriptors = (descriptions) => {
         return descriptions.map((description)=>{
@@ -144,29 +145,19 @@ function Body(props) {
 
 
     useEffect(()=>{
-        const fetchRecognition = async ()=>{
-            try {
-                const response = await recognitionApi.getAll();
-                const result = response.map((l)=>{
-                    const array = []
-                    for (let i of l.faceDetects){
-                        array.push(Float32Array.from(i.map((e)=> parseFloat(e))));
-                    }
-                    return {...l,faceDetects: array};
-                })
-                setFaceDescription(() => result);
-            } catch (error) {
-                console.log(error);
+        const loadModal = ()=>{
+            if(info.length !== 0){
+                setShowModal(true);
             }
         }
-        fetchRecognition();
+        loadModal();
     },[reload]);
     return (
         <Spin spinning={loadModels} className='spin-body' tip='Loading models...'>
         <div className="wrap-body">
             <div className='wrap-recognition container'>
                 <div className='wrap-button'>
-                    <InputFile setReplay={setReplay} setReload={setReload} reload={reload}></InputFile>
+                    <InputFile setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>
                     {recognition === false
                     ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Face Recognition</Button>)
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)
@@ -188,6 +179,7 @@ function Body(props) {
                     </div>)}
                 </div>
             </div>
+            {showModal === true && <TrainStatus info={info} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
         </div>
         </Spin>
     )

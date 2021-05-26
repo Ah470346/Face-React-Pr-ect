@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 
 
-function InputFile({setReload,reload,setReplay}) {
+function InputFile({setReload,reload,setReplay,setInfo}) {
     const [train, setTrain] = useState(false);
     const [success, setSuccess] = useState("");
     const [trainLoading, setTrainLoading] = useState("Train");
@@ -98,6 +98,13 @@ function InputFile({setReload,reload,setReplay}) {
             })
             return {label: i , images: a};
         })
+        //set information up load
+        const info = [];
+        for(let i of result){
+            info.push({name: i.label, images: i.images.length});
+        } 
+        setInfo(info);
+        //-------------------------
         setTrain(true);
         setSpin(true);
         setDataUpLoad(result);

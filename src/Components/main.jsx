@@ -10,9 +10,10 @@ import {
 } from "react-router-dom";
 import * as faceapi from 'face-api.js';
 
-function Main({fetchUser,status}) {
+function Main({fetchUser,status,fetchFaceDetect}) {
     useEffect(()=>{
         fetchUser();
+        fetchFaceDetect();
         const fetchModels = async () =>{
           await faceapi.nets.faceLandmark68Net.load('/models');
           await faceapi.nets.ssdMobilenetv1.load('/models');

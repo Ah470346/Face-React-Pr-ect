@@ -82,4 +82,10 @@
 
         }
     }
+
+    .train-status {
+        & .wrap-item {
+            @include flexBox(row,space-between,center);
+        }
+    }
 }
