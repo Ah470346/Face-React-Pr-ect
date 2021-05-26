@@ -155,6 +155,7 @@ function Body(props) {
     return (
         <Spin spinning={loadModels} className='spin-body' tip='Loading models...'>
         <div className="wrap-body">
+            <div>hello</div>
             <div className='wrap-recognition container'>
                 <div className='wrap-button'>
                     <InputFile setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>
@@ -179,7 +180,7 @@ function Body(props) {
                     </div>)}
                 </div>
             </div>
-            {showModal === true && <TrainStatus info={info} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
+            {showModal === true && <TrainStatus info={info} setInfo={setInfo} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
         </div>
         </Spin>
     )

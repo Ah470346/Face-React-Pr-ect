@@ -5,7 +5,7 @@ import Success from '../../assets/success.svg';
 import Failed from '../../assets/failed.svg';
 import {useSelector} from 'react-redux';
 
-function TrainStatus({setShowModal,info}) {
+function TrainStatus({setShowModal,info,setInfo}) {
     const faceDescriptions = useSelector(state=> state.faceDetect)
     return (
         <Modal
@@ -13,8 +13,8 @@ function TrainStatus({setShowModal,info}) {
           centered
           closable={false}
           visible={true}
-          onOk={() => setShowModal(false)}
-          onCancel={() => setShowModal(false)}
+          onOk={() => {setShowModal(false); setInfo([])}}
+          onCancel={() => {setShowModal(false); setInfo([]); console.log('cancel');}}
           className='train-status'
           width='700px'
         >
