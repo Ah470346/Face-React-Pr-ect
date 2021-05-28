@@ -58,4 +58,20 @@ html , body {
             border-bottom: none;
         }
     }
+    & .list-item-exist{
+        @include flexBox(row,space-between,center);
+        padding: 5px 0;
+
+        p {
+            margin: 0;
+        }
+
+        & .wrap-folder{
+            @include flexBox(row,flex-start,center);
+
+            p{
+                margin-left: 10px;
+            }
+        } 
+    }
 }

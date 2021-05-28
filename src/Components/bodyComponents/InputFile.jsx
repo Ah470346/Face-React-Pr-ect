@@ -1,7 +1,8 @@
 import React , {useState} from 'react';
-import { Button ,notification,Tooltip,Spin} from 'antd';
+import { Button ,notification,Tooltip,Spin,Modal, Checkbox } from 'antd';
 import * as faceapi from 'face-api.js';
 import shortID from 'shortid';
+import Folder from '../../assets/folder.svg';
 import recognitionApi from '../../api/recognitionApi';
 import {useSelector,useDispatch} from 'react-redux';
 import {fetchFaceDetect} from '../../Actions/actionCreators';
@@ -13,13 +14,43 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
 
     const [train, setTrain] = useState(false);
+    //modal visible
+    const [visible, setVisible] = useState(false);
     const [success, setSuccess] = useState("");
     const [trainLoading, setTrainLoading] = useState("Train");
     const [spin, setSpin] = useState(true);
     const [dataUpLoad , setDataUpLoad] = useState([]);
 
+
     const history = useHistory();
+    const faceDescriptions = useSelector(state => state.faceDetect);
     const status = useSelector(state => state.status);
+    //---------------------------------show modal retrain
+    const [dataExist , setDataExist] = useState([]);
+    const hideModal = () => {
+        setVisible(false);
+    };
+    
+    const showModal = () => {
+        setVisible(true);
+    };
+
+    const checkRetrain = (data) => {
+        console.log(data);
+        let arry =[];
+        for(let i of data){
+            for(let j of faceDescriptions){
+                if(i.label === j.label){
+                    arry.push(i);
+                }
+            }
+        }
+        setDataExist(arry);
+    }
+    //----------------------------------------Checkbox
+    const onChange = (e) => {
+        console.log('checked = ', e.target.checked);
+      };
     //----------------------------------Convert image to base64
     function getBase64(file) {
         return new Promise((resolve, reject) => {
@@ -42,7 +73,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     const handleUpLoad = (event) => {
         fetchFaceDetects();
         const files = Object.values(event.target.files);
-        if(files.length >= 100){
+        if(files.length >= 150){
             notification.error({
                 message: 'Số lượng file quá lớn !!!',
                 description:
@@ -60,11 +91,17 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
             setDataUpLoad([]);
             return;
         }
+        let filterFiles =[];
+        for(let i of files){
+            if(i.type.includes('image')){
+                filterFiles.push(i);
+            }
+        }
         const array = [];
         const Labels = [];
         let first , last, dem = 0 , result1, result2 = ""; 
-        for(let i = 0 ; i < files.length ; i++ ){
-            let str = files[i].webkitRelativePath;
+        for(let i = 0 ; i < filterFiles.length ; i++ ){
+            let str = filterFiles[i].webkitRelativePath;
             for(let i1 = 0 ; i1 < str.length ; i1++){
                 if(str.charAt(i1)==='/' && dem === 0){
                     first = i1 +1; 
@@ -89,7 +126,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
             }
             dem = 0;
             if(result1 !== result2){
-                const arr = files.filter((file)=>{
+                const arr = filterFiles.filter((file)=>{
                     return file.webkitRelativePath.includes(result1);
                 })
                 array.push(arr);
@@ -113,6 +150,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
         setTrain(true);
         setSpin(true);
         setDataUpLoad(result);
+        checkRetrain(result);
         setTimeout(()=>{
             setSpin(false);
             setSuccess("Folder was ready");
@@ -140,12 +178,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     }
     //----------------------------------call train images when download face-api and set dataDetects
     const handleTrain = () =>{
-        if(status.protect ==='false' ){
-            notification.error({
-                message: 'Yêu cầu đăng nhập trước khi trainning !!!',
-            });
-            history.push('/login');
-        } else {
+        { 
             setSpin(true);
             setTrainLoading("Training....");
             setSuccess("");
@@ -178,36 +211,75 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
                     setReload(!reload);
                     setReplay(true);
                     fetchFaceDetects();
+                    checkRetrain(dataUpLoad);
                 }
             }
             handle();
         }
     }
     return (
-        <div className='wrap-input'>
+        <>
+            <Modal
+            title="Modal"
+            centered
+            visible={visible}
+            onOk={()=>{hideModal();handleTrain()}}
+            onCancel={hideModal}
+            okText="ReTrain"
+            cancelText="Cancel"
+            >
             {
-                train === false ?
-                <>
-                <Tooltip  placement="top" title='Chỉ nhận upload folder'>
-                    <label htmlFor='train'>Choose folder to train</label>
-                </Tooltip>
-                <input onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
-                <p>No folder was choice</p>
-                </>
-                : <>
-                    <Spin spinning={spin} className='spin'>
-                        <Tooltip  placement="top" title='*Lưu ý: Tên folder chứa ảnh sẽ được lấy làm tên nhận diện khuôn mặt!'>
-                            <Button 
-                                onClick={()=>{
-                                    handleTrain();
-                                }} 
-                                type="primary">{trainLoading}</Button>
-                        </Tooltip> 
-                    </Spin>
-                        <p>{success}</p>
-                </> 
+                dataExist.map((i,index)=>{
+                    return( <div className="list-item-exist">
+                        <div className="wrap-folder">
+                                <img src={Folder} alt=""></img>
+                                <p>{i.label}</p>
+                        </div>
+                        <div className='choose-folder'>
+                            <Checkbox onChange={onChange}></Checkbox>
+                        </div>
+                    </div>
+                    )
+                })
             }
-        </div>
+        </Modal>
+            <div className='wrap-input'>
+                {
+                    train === false ?
+                    <>
+                    <Tooltip  placement="top" title='Chỉ nhận upload folder'>
+                        <label htmlFor='train'>Choose folder to train</label>
+                    </Tooltip>
+                    <input onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
+                    <p>No folder was choice</p>
+                    </>
+                    : <>
+                        <Spin spinning={spin} className='spin'>
+                            <Tooltip  placement="top" title='*Lưu ý: Tên folder chứa ảnh sẽ được lấy làm tên nhận diện khuôn mặt!'>
+                                <Button 
+                                    onClick={()=>{
+                                        if(status.protect ==='false' ){
+                                            notification.error({
+                                                message: 'Yêu cầu đăng nhập trước khi trainning !!!',
+                                            });
+                                            history.push('/login');
+                                        } else{
+                                            if(dataExist.length!==0){
+                                                showModal();
+                                            } else{
+                                                handleTrain();
+                                            }
+                                        }
+                                        
+                                    }} 
+                                    type="primary">{trainLoading}</Button>
+                            </Tooltip> 
+                        </Spin>
+                            <p>{success}</p>
+                    </> 
+                }
+            </div>
+        </>
     )
 }
 

@@ -66,13 +66,16 @@
         padding-bottom: 20px;
         width: 60%;
 
+
+        & .list-item-exist{
+            @include flexBox(row,space-between,center)
+        }
         & .wrap-button {
             @include flexBox(row,space-around,center);
             padding: 0 50px 0 50px;
             & .wrap-input {
                 position: relative;
                 @include flexBox(column,center,center);
-
 
                 & label {
                     width: 220px;
@@ -137,6 +140,7 @@
     }
 
     .train-status {
+        overflow-y: auto;
         & .wrap-item {
             @include flexBox(row,space-between,center);
         }
