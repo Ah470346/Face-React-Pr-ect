@@ -1,5 +1,5 @@
-import React,{useState} from 'react';
-import { Modal, Button } from 'antd';
+import React from 'react';
+import { Modal } from 'antd';
 import Folder from '../../assets/folder.svg';
 import Success from '../../assets/success.svg';
 import Failed from '../../assets/failed.svg';

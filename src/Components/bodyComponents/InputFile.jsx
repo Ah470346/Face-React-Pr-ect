@@ -1,13 +1,17 @@
-import React , {useState,useRef} from 'react';
+import React , {useState} from 'react';
 import { Button ,notification,Tooltip,Spin} from 'antd';
 import * as faceapi from 'face-api.js';
 import shortID from 'shortid';
 import recognitionApi from '../../api/recognitionApi';
-import {useSelector} from 'react-redux';
+import {useSelector,useDispatch} from 'react-redux';
+import {fetchFaceDetect} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
 
 
 function InputFile({setReload,reload,setReplay,setInfo}) {
+    const dispatch = useDispatch();
+    const fetchFaceDetects = () => dispatch(fetchFaceDetect());
+
     const [train, setTrain] = useState(false);
     const [success, setSuccess] = useState("");
     const [trainLoading, setTrainLoading] = useState("Train");
@@ -36,6 +40,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     }
     //----------------------------------handler when up load files 
     const handleUpLoad = (event) => {
+        fetchFaceDetects();
         const files = Object.values(event.target.files);
         if(files.length >= 100){
             notification.error({
@@ -135,7 +140,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     }
     //----------------------------------call train images when download face-api and set dataDetects
     const handleTrain = () =>{
-        if(status.length <= 1){
+        if(status.protect ==='false' ){
             notification.error({
                 message: 'Yêu cầu đăng nhập trước khi trainning !!!',
             });
@@ -172,6 +177,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
                     setTrainLoading('Train');
                     setReload(!reload);
                     setReplay(true);
+                    fetchFaceDetects();
                 }
             }
             handle();

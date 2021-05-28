@@ -1,11 +1,13 @@
 import React, {useState  ,useRef,useEffect} from 'react';
-import { Button ,notification,Spin} from 'antd';
+import { Button ,notification} from 'antd';
 import * as canvas from 'canvas';
 // import '@tensorflow/tfjs-node';
-import {useSelector} from 'react-redux';
+import {useSelector,useDispatch} from 'react-redux';
+import {fetchFaceDetect} from '../../Actions/actionCreators';
 import * as faceapi from 'face-api.js';
 import InputFile from './InputFile';
 import TrainStatus from './trainStatus';
+import ListTrain from './listTrain';
 
 
 const { Canvas, Image, ImageData } = canvas
@@ -20,7 +22,10 @@ faceapi.env.monkeyPatch ({
 
     
 function Body(props) {
-    const [loadModels, setLoadModels] = useState(false);
+    const dispatch = useDispatch();
+    const fetchFaceDetects = () => dispatch(fetchFaceDetect());
+    // spin load models
+    // const [loadModels, setLoadModels] = useState(false);
     const [openCamVideo, setOpenCamVideo] = useState(false);
     const [recognition, setRecognition] = useState(false);
     const [reload,setReload] = useState(false);
@@ -65,14 +70,14 @@ function Body(props) {
             const resizeDetections = faceapi.resizeResults(detections,displaySize);
 
             // draw canvas by boxResize
-            const boxResize = (resizeDetections)=>{
-                if(resizeDetections[0] === undefined){
-                    return [];
-                } else {
-                    console.log(resizeDetections[0].alignedRect._box);
-                    return resizeDetections[0].alignedRect._box;
-                }
-            }
+            // const boxResize = (resizeDetections)=>{
+            //     if(resizeDetections[0] === undefined){
+            //         return [];
+            //     } else {
+            //         console.log(resizeDetections[0].alignedRect._box);
+            //         return resizeDetections[0].alignedRect._box;
+            //     }
+            // }
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
             if(faceMatcher.length === 0){
                 faceapi.draw.drawDetections(canvas,resizeDetections);
@@ -98,6 +103,7 @@ function Body(props) {
     }
 
     const streamCamVideo = (video) => {
+        fetchFaceDetects();
         const constraints = {audio: false , video : true};
         navigator.mediaDevices
         .getUserMedia(constraints)
@@ -153,10 +159,12 @@ function Body(props) {
         loadModal();
     },[reload]);
     return (
-        <Spin spinning={loadModels} className='spin-body' tip='Loading models...'>
+        // <Spin style={{height:'100%'}} spinning={loadModels} className='spin-body' tip='Loading models...'>
         <div className="wrap-body">
-            <div>hello</div>
-            <div className='wrap-recognition container'>
+            <div className={'wrap-list-train'}>
+                <ListTrain></ListTrain>
+            </div>
+            <div className='wrap-recognition'>
                 <div className='wrap-button'>
                     <InputFile setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>
                     {recognition === false
@@ -164,7 +172,7 @@ function Body(props) {
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)
                     }   
                 </div>
-                <div id="wrap-video" className='wrap-video'>
+                <div id="wrap-video" className='wrap-video' >
                     { openCamVideo === true ? (
                     <>
                         <video width="720" height="560" id="video" onPlay={()=>{handlePlay(elVideo)}} ref={elVideo}></video>
@@ -182,7 +190,7 @@ function Body(props) {
             </div>
             {showModal === true && <TrainStatus info={info} setInfo={setInfo} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
         </div>
-        </Spin>
+        // </Spin>
     )
 }
 

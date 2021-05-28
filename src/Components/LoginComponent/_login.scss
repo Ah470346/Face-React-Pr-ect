@@ -30,8 +30,20 @@
                          color: #fea900;
                          margin-bottom: 30px;
                      }
+                     // responsive
+                     @media all and (max-width: 1542px){
+                        & .singin-title {
+                            font-size:1.2em;
+                        }
+                     }
 
                 }
+                // responsive
+                @media all and (max-width: 1542px){
+                    & .title {
+                        margin-top: 40px;
+                    }
+                 }
 
                 & form {
                     

@@ -1,7 +1,7 @@
 
 .wrap-body {
-    // width: 100%;
-    // height: 100%;
+    position: relative;
+    @include flexBox(row,center);
 
     & p{
         margin: 0;
@@ -9,13 +9,66 @@
         color: rgb(141, 137, 137);
     }
 
+    & .wrap-list-train {
+        position: absolute;
+        width: 20%;
+        height: 745px;
+        left: 0;
+        top: 0;
+        padding-top: 40px;
+        padding-left: 20px;
+        padding-bottom: 20px;
+
+        & .list-train{
+            width: 100%;
+            height: 100%;
+            padding-top: 10px;
+            font-family: $fontFamily;;
+            // @include flexBox(column,center,center);
+
+            & > p {
+                color: #000;
+                display: inline-block;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+                font-size: 1.2em;
+                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+            }
+
+            & .scroll-list {
+                width: 100%;
+                @include calc(height, '100% - 49px');
+                overflow-y:hidden;
+
+                & .list-item {
+                    @include flexBox(row,flex-start, center);
+                    padding: 5px 10px;
+                    cursor: pointer;
+                    img{
+                        margin-right: 10px;
+                    }
+                    p {
+                        color: #1a1a1a;
+                        font-size: 1.1em;
+                    }
+                }
+            }
+
+            & .scroll-list:hover {
+                overflow-y:auto;
+            }
+        }
+
+    }
+
     & .wrap-recognition {
         padding-top: 40px;
         padding-bottom: 20px;
+        width: 60%;
 
         & .wrap-button {
             @include flexBox(row,space-around,center);
-            padding: 0 70px 0 70px;
+            padding: 0 50px 0 50px;
             & .wrap-input {
                 position: relative;
                 @include flexBox(column,center,center);
@@ -55,7 +108,7 @@
 
         & .wrap-video {
             position: relative;
-            margin: 50px 60px 10px 60px;
+            margin: 50px 20px 10px 20px;
             padding: 5px;
             height: 570px;
             border: 1px solid rgba($color: #000000, $alpha: 0.1);

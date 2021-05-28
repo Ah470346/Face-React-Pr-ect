@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React from 'react';
 import Logo from '../../assets/VBPO.png';
 import {
     Navbar,
@@ -10,11 +10,12 @@ import {
     Link
 } from "react-router-dom";
 import {useSelector,useDispatch} from 'react-redux';
-import {clearLogin} from '../../Actions/actionCreators';
+import {clearLogin,fetchFaceDetect} from '../../Actions/actionCreators';
 
 function Header(props) {
     const dispatch = useDispatch();
     const clearStatus = () => dispatch(clearLogin());
+    const fetchFace = () => dispatch(fetchFaceDetect());
     const status = useSelector(state => state.status);;
     const signOut = ()=>{
         localStorage.removeItem('username');
@@ -31,13 +32,13 @@ function Header(props) {
                 </NavbarBrand>
                 <Nav className="mr-auto" navbar>
                     <NavItem>
-                        <Link className='nav-link' to="/">Home</Link>
+                        <Link onClick={fetchFace} className='nav-link' to="/">Home</Link>
                     </NavItem>
                 </Nav>
                 <Nav className="mr-auto sign-in" navbar>
                     <NavItem>
                         {
-                            (status.protect === 'false' || status.length ===0) ? <Link className='nav-link' to="/login">Sign in</Link>
+                            (status.protect === 'false' || status.length ===0) ? <Link onClick={fetchFace} className='nav-link' to="/login">Sign in</Link>
                             : <Link onClick={signOut} className='nav-link' to="/login">Sign out</Link>
                         }
                         
