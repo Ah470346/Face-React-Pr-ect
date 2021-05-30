@@ -104,7 +104,7 @@ function Body(props) {
 
     const streamCamVideo = (video) => {
         fetchFaceDetects();
-        const constraints = {audio: false , video : true};
+        const constraints = {audio : false,video : true};
         navigator.mediaDevices
         .getUserMedia(constraints)
         .then(function(mediaStream) {
@@ -175,7 +175,7 @@ function Body(props) {
                 <div id="wrap-video" className='wrap-video' >
                     { openCamVideo === true ? (
                     <>
-                        <video width="720" height="560" id="video" onPlay={()=>{handlePlay(elVideo)}} ref={elVideo}></video>
+                        <video playsInline autoPlay muted type='video/mp4' width="720" height="560" id="video" onPlay={()=>{handlePlay(elVideo)}} ref={elVideo}></video>
                     </>
                     )
                     :
