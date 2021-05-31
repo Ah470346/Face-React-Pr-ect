@@ -1,12 +1,12 @@
 import React , {useState} from 'react';
 import { Button ,notification,Tooltip,Spin,Modal, Checkbox } from 'antd';
-import * as faceapi from 'face-api.js';
-import shortID from 'shortid';
 import Folder from '../../assets/folder.svg';
-import recognitionApi from '../../api/recognitionApi';
 import {useSelector,useDispatch} from 'react-redux';
 import {fetchFaceDetect} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
+import {handleTrainImages} from "./Training";
+import shortID from 'shortid';
+import recognitionApi from '../../api/recognitionApi';
 
 
 function InputFile({setReload,reload,setReplay,setInfo}) {
@@ -156,67 +156,47 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
             setSuccess("Folder was ready");
         },1500)
     }
-    //----------------------------------handler train images 
-    const handleTrainImages = () =>{
-        return Promise.all([
-            dataUpLoad.map(async label =>{
-                const descriptions = [];
-                for(let i of label.images){
-                    const img = await i;
-                    const a = document.createElement('img');
-                    a.src = img;
-                    const detections = await faceapi.detectSingleFace(a)
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                    if(detections.descriptor){
-                        descriptions.push(detections.descriptor);
-                    }   
-                }
-                return {label: label.label , faceDetects: descriptions};
-            })
-        ]);
-    }
     //----------------------------------call train images when download face-api and set dataDetects
     const handleTrain = () =>{
-        { 
-            setSpin(true);
-            setTrainLoading("Training....");
-            setSuccess("");
-            const handle =  async ()=>{
-                const result = [];
-                const faceDetectPromise =  await handleTrainImages();
-                for(let i of faceDetectPromise[0]){
-                    let a = await i ; 
-                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
-                }
-                if(result.length === faceDetectPromise[0].length){
-                    // push data to server
-                    for(let i = 0 ; i < result.length ; i++){
-                        let array = [];
-                        for(let e of result[i].faceDetects){
-                            array.push(Array.from(e).map(String));
-                        }
-                        await recognitionApi.postRecognition({...result[i],
-                            faceDetects: array})
-                    }
-                    //-----------------------------------------------------
-                    setSpin(false);
-                    notification.success({
-                        message: 'Train thành công !!!',
-                        description:
-                            'Quá trình train hoàn tất !',
-                    });
-                    setTrain(false);
-                    setTrainLoading('Train');
-                    setReload(!reload);
-                    setReplay(true);
-                    fetchFaceDetects();
-                    checkRetrain(dataUpLoad);
-                }
+    { 
+        setSpin(true);
+        setTrainLoading("Training....");
+        setSuccess("");
+        const handle =  async ()=>{
+            const result = [];
+            const faceDetectPromise =  await handleTrainImages(dataUpLoad);
+            for(let i of faceDetectPromise[0]){
+                let a = await i ; 
+                result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
             }
-            handle();
+            if(result.length === faceDetectPromise[0].length){
+                // push data to server
+                for(let i = 0 ; i < result.length ; i++){
+                    let array = [];
+                    for(let e of result[i].faceDetects){
+                        array.push(Array.from(e).map(String));
+                    }
+                    await recognitionApi.postRecognition({...result[i],
+                        faceDetects: array})
+                }
+                //-----------------------------------------------------
+                setSpin(false);
+                notification.success({
+                    message: 'Train thành công !!!',
+                    description:
+                        'Quá trình train hoàn tất !',
+                });
+                setTrain(false);
+                setTrainLoading('Train');
+                setReload(!reload);
+                setReplay(true);
+                fetchFaceDetects();
+                checkRetrain(dataUpLoad);
+            }
         }
+        handle();
     }
+}
     return (
         <>
             <Modal
