@@ -4,6 +4,7 @@ import * as faceapi from 'face-api.js';
 const labeledDescriptors = (descriptions) => {
     return descriptions.map((description)=>{
         let face = new faceapi.LabeledFaceDescriptors(description.label, description.faceDetects);
+        console.log(face);
         return face;
     });
 }
@@ -34,8 +35,7 @@ export const handlePlay = (vd,faceDescriptions) =>{
             new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks().withFaceDescriptors();
         const resizeDetections = faceapi.resizeResults(detections,displaySize);
-
-        // draw canvas by boxResize
+        console.log(resizeDetections);
         // const boxResize = (resizeDetections)=>{
         //     if(resizeDetections[0] === undefined){
         //         return [];
@@ -44,18 +44,24 @@ export const handlePlay = (vd,faceDescriptions) =>{
         //         return resizeDetections[0].alignedRect._box;
         //     }
         // }
+
+        // const Resize = boxResize(resizeDetections);
         canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
         if(faceMatcher.length === 0){
-            faceapi.draw.drawDetections(canvas,resizeDetections);
+            resizeDetections.forEach((r,i)=>{
+                const box = resizeDetections[i].detection.box;
+                const drawBox = new faceapi.draw.DrawBox(box,{label: "unknown"});
+                drawBox.draw(canvas);
+            })
         } else if(faceMatcher.length !== 0){
             const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
             canvas.getContext('2d').clearRect(0,0, canvas.width,canvas.height);
             results.forEach((r,i)=>{
                 const box = resizeDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box,{label: r.toString()});
+                const drawBox = new faceapi.draw.DrawBox(box,{label: r.label});
                 drawBox.draw(canvas);
             })
         }
-    },200);
+    },150);
 
 }
