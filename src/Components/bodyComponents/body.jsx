@@ -91,8 +91,6 @@ function Body(props) {
         setOpenCamVideo(false);
         setRecognition(false);
     }
-
-
     useEffect(()=>{
         const loadModal = ()=>{
             if(info.length !== 0){

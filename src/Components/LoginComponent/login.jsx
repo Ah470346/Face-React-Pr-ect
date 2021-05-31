@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser , faLock} from '@fortawesome/free-solid-svg-icons';
 import {userLogin,fetchFaceDetect} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
+import authApi from '../../api/authApi';
 function Login(props) {
     const users = useSelector(state => state.users);
     // const status = useSelector(state => state.status);
@@ -28,36 +29,35 @@ function Login(props) {
         },
     };
 
-    const checkUser = (users,values)=>{
-        for (let i of users){
-            if(values.username === i.userName && values.password === i.password ){
-                return true;
+    const postAuth = async (user)=>{
+        try {
+            const response = await authApi.postAuth(user);
+            if(response){
+                notification.success({
+                    message: `Đăng nhập thành công!`
+                });
+                Login(user);
+                for(let property in user){
+                    if(property !== 'password'){
+                        localStorage.setItem(property,user[property]);
+                    }
+                }
+                localStorage.setItem('protect',true);
+                fetchFace();
+                history.push('/'); 
             }
+        } catch (e) {
+            if (e.response && e.response.data) {
+                notification.error({
+                    message: `${e.response.data.message}!`
+                });
+              }
         }
-        return false;
     }
     
 
     const onFinish = (values) => {
-        if(checkUser(users,values) === true){
-            notification.success({
-                message: 'Đăng nhập thành công!'
-            });
-            Login(values);
-            for(let property in values){
-                if(property !== 'password'){
-                    localStorage.setItem(property,values[property]);
-                }
-            }
-            localStorage.setItem('protect',true);
-            fetchFace();
-            history.push('/');  
-        } else {
-            notification.error({
-                message: 'Đăng nhập thất bại!',
-                description: "Tài khoản hoặc mật khẩu không chính xác, xin nhập lại!"   
-            });
-        }
+        postAuth(values);
     };
     
     const onFinishFailed = (errorInfo) => {
@@ -123,20 +123,7 @@ function Login(props) {
                         </Form.Item>
                     </Form>
                 </div>
-                <div className='welcome'>
-                    <div className='welcome-text'>
-                        <div className='welcome-to'>
-                            <p> <span>Welcome</span> to VBPO</p>
-                        </div>
-                        <div className='introduction'>
-                            <p>Công ty cổ phần V.B.P.O là công ty chuyên về các nghiệp vụ BPO (Business Process Outsourcing – Gia công quy trình doanh nghiệp),
-                                với đối tác là các doanh nghiệp Nhật Bản, Mỹ…, làm toàn bộ những công việc liên quan đến ứng dụng công nghệ thông tin, từ những 
-                                công việc đơn giản nhất như nhập dữ liệu, số hóa văn bản… cho đến những công việc phức tạp hơn như dịch vụ kế toán, tài chính, 
-                                chăm sóc khách hàng, xử lý đồ họa…</p>
-                        </div>
-                    </div>
-                    <div className='welcome-bottom'></div>
-                </div>
+                <div className='image-bottom'></div>
             </div>
         </div>
     )
