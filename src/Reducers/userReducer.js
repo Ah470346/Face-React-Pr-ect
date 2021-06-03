@@ -1,8 +1,10 @@
-import {LOAD_USER} from '../Actions/actionCreators';
+import {LOAD_USER,SET_PERMISSION} from '../Actions/actionCreators';
 
 const initalState = [
 
 ];
+
+const initalState2= localStorage;
 
 const userReducer = (state = initalState,action) => {
     switch(action.type){
@@ -15,4 +17,14 @@ const userReducer = (state = initalState,action) => {
     }
 }
 
+export const permissionReducer = (state = initalState2,action)=>{
+    switch(action.type){
+        case SET_PERMISSION:
+            return action.data;
+        default:
+            return state;
+    }
+}
+
 export default userReducer;
+

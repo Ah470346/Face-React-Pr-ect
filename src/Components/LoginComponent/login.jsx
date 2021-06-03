@@ -1,19 +1,17 @@
 import React from 'react';
-import {useSelector,useDispatch} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import { Form, Input, Button, Checkbox ,notification} from 'antd';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser , faLock} from '@fortawesome/free-solid-svg-icons';
-import {userLogin,fetchFaceDetect} from '../../Actions/actionCreators';
+import {userLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
 import authApi from '../../api/authApi';
 function Login(props) {
-    const users = useSelector(state => state.users);
-    // const status = useSelector(state => state.status);
-
     const history = useHistory();
     const dispatch = useDispatch();
     const Login = (user) => dispatch(userLogin(user));
     const fetchFace = ()=> dispatch(fetchFaceDetect())
+    const setPermis = (user) => dispatch(setPermission(user));
 
     const layout = {
         labelCol: {
@@ -43,6 +41,8 @@ function Login(props) {
                     }
                 }
                 localStorage.setItem('protect',true);
+                localStorage.setItem('permission',response);
+                setPermis({permission: response});
                 fetchFace();
                 history.push('/'); 
             }

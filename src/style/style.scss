@@ -22,56 +22,94 @@ html , body {
     
     }
     .train-status {
-        p {
-            margin: 0;
-        }
-        & .wrap-item {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            @include flexBox(row,space-between,center);
-            & .wrap-folder {
-                @include flexBox(row,center,center);
-
-                img {
-                    margin-right: 10px
+        & .scroll-list-train {
+            overflow-y: auto;
+            max-height: 300px;
+            & .wrap-item {
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                padding: 10px;
+                @include flexBox(row,space-between,center);
+                & .wrap-folder {
+                    @include flexBox(row,center,center);
+    
+                    img {
+                        margin-right: 10px
+                    }
+                    p {
+                        margin-top: 3px;
+                    }
                 }
-                p {
-                    margin-top: 3px;
+    
+                & .status {
+                    @include flexBox(row,center,center);
+    
+                    .success {
+                        margin-right: 15px;
+                        color: rgb(11, 168, 63);
+                    }
+    
+                    .failed {
+                        margin-right: 15px;
+                        color: rgb(241, 45, 11);
+                    }
                 }
             }
-
-            & .status {
-                @include flexBox(row,center,center);
-
-                .success {
-                    margin-right: 15px;
-                    color: rgb(11, 168, 63);
-                }
-
-                .failed {
-                    margin-right: 15px;
-                    color: rgb(241, 45, 11);
-                }
+            & .wrap-item:last-child {
+                border-bottom: none;
             }
-        }
-        & .wrap-item:last-child {
-            border-bottom: none;
         }
     }
-    & .list-item-exist{
-        @include flexBox(row,space-between,center);
-        padding: 5px 0;
+    & .retrain-status{
+        font-family: $fontFamily;
+        & .list-title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        & .list-title.new {
+            margin-top: 10px;
+        }
+        & .scroll-list{
+            max-height: 250px;
+            overflow: auto;
 
+            & .list-item-exist{
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                @include flexBox(row,space-between,center);
+                padding: 7px 10px 7px 0;
+        
+                & .wrap-folder{
+                    @include flexBox(row,flex-start,center);
+        
+                    p{
+                        margin-left: 10px;
+                    }
+                } 
+            }
+
+            & .list-item-exist:last-child{
+                border-bottom: none;
+            }
+            & .list-item-exist:first-child{
+                padding-top: 0px;
+            }
+            & img:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+
+    .ant-modal-content{
         p {
             margin: 0;
+            font-size: 1.1em;
         }
-
-        & .wrap-folder{
-            @include flexBox(row,flex-start,center);
-
-            p{
-                margin-left: 10px;
-            }
-        } 
+        & .ant-modal-title {
+            font-weight: 800 !important;
+            font-size: 1.3em;
+        }
+        & .ant-modal-body {
+            padding-top: 15px;
+        }
     }
+    
 }

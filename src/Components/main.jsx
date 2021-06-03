@@ -9,8 +9,10 @@ import {
     Redirect
 } from "react-router-dom";
 import * as faceapi from 'face-api.js';
+import {isMobile} from 'react-device-detect';
+import CaptureMobile from './CaptureMobile';
 
-function Main({fetchUser,status,fetchFaceDetect}) {
+function Main({fetchUser,status,fetchFaceDetect,permission}) {
     useEffect(()=>{
         fetchUser();
         fetchFaceDetect();
@@ -20,20 +22,24 @@ function Main({fetchUser,status,fetchFaceDetect}) {
           await faceapi.nets.tinyFaceDetector.load('/models');
           await faceapi.nets.faceRecognitionNet.load('/models');
       } 
-      fetchModels();
+      // fetchModels();
     },[fetchUser]);
     return (
         <Router>
             <div className='main'>
                 <Header></Header>
-                <Switch>
+                {
+                  isMobile === false ?
+                   <Switch>
                     <ProtectLoginRoute exact path="/login" protect={status.protect}>
                         <Login/>
                     </ProtectLoginRoute>
-                    <Route exact path="/">
+                    <Route exact path="/" permission={permission.permission}>
                         <Body/>
                     </Route>
-                </Switch>
+                  </Switch>
+                  : <CaptureMobile></CaptureMobile>
+                }
             </div>
         </Router>
     )
@@ -53,6 +59,21 @@ const ProtectLoginRoute = ({protect,children,...rest})=>{
       />
     )
   }
+
+const ProtectHomeRoute = ({permission,children,...rest})=>{
+  return (
+    <Route
+      {...rest}
+      render = {()=> permission === "admin" || permission ==="user" ? (
+        children
+      ):
+        (
+          <Redirect to='/login'></Redirect>
+        )
+      }
+    />
+  )
+}
 
 export default Main;
 

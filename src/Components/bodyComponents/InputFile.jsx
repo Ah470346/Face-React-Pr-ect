@@ -1,24 +1,24 @@
 import React , {useState} from 'react';
-import { Button ,notification,Tooltip,Spin,Modal, Checkbox } from 'antd';
-import Folder from '../../assets/folder.svg';
+import {notification,Tooltip,Spin} from 'antd';
 import {useSelector,useDispatch} from 'react-redux';
 import {fetchFaceDetect} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
 import {handleTrainImages} from "./Training";
 import shortID from 'shortid';
 import recognitionApi from '../../api/recognitionApi';
+import ListRetrain from './listRetrain';
+import * as faceapi from 'face-api.js';
 
 
 function InputFile({setReload,reload,setReplay,setInfo}) {
     const dispatch = useDispatch();
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
 
-    const [train, setTrain] = useState(false);
     //modal visible
     const [visible, setVisible] = useState(false);
-    const [success, setSuccess] = useState("");
-    const [trainLoading, setTrainLoading] = useState("Train");
-    const [spin, setSpin] = useState(true);
+    
+    const [trainLoading, setTrainLoading] = useState("Choose folder to train");
+    const [spin, setSpin] = useState(false);
     const [dataUpLoad , setDataUpLoad] = useState([]);
 
 
@@ -27,30 +27,36 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     const status = useSelector(state => state.status);
     //---------------------------------show modal retrain
     const [dataExist , setDataExist] = useState([]);
-    const hideModal = () => {
-        setVisible(false);
-    };
+    const [dataNew , setDataNew] = useState([]);
     
-    const showModal = () => {
-        setVisible(true);
-    };
 
     const checkRetrain = (data) => {
-        console.log(data);
-        let arry =[];
+        let arry1 =[];
+        let arry2 =[];
+        //------------------------data exist
         for(let i of data){
             for(let j of faceDescriptions){
                 if(i.label === j.label){
-                    arry.push(i);
+                    arry1.push(i);
                 }
             }
         }
-        setDataExist(arry);
+        //--------------------------data new
+        for(let i of data){
+            let check = true;
+            for(let j of arry1){
+                if(i.label === j.label){
+                    check = false
+                }
+            }
+            if(check === true){
+                arry2.push(i);
+            }
+            
+        }
+        setDataExist(arry1);
+        setDataNew(arry2);
     }
-    //----------------------------------------Checkbox
-    const onChange = (e) => {
-        console.log('checked = ', e.target.checked);
-      };
     //----------------------------------Convert image to base64
     function getBase64(file) {
         return new Promise((resolve, reject) => {
@@ -72,12 +78,13 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     //----------------------------------handler when up load files 
     const handleUpLoad = (event) => {
         fetchFaceDetects();
+        setSpin(true);
         const files = Object.values(event.target.files);
         if(files.length >= 150){
             notification.error({
                 message: 'Số lượng file quá lớn !!!',
                 description:
-                  'hãy tách thành các folder có số lượng files không quá 100',
+                'hãy tách thành các folder có số lượng files không quá 100',
             });
             setDataUpLoad([]);
             return;
@@ -86,7 +93,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
             notification.error({
                 message: 'File không hợp lệ !!!',
                 description:
-                  'File trống hoặc file có kiểu khác image, xin upload lại!',
+                'File trống hoặc file có kiểu khác image, xin upload lại!',
             });
             setDataUpLoad([]);
             return;
@@ -113,7 +120,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
                     notification.error({
                         message: 'Cấp thư mục quá cao !!!',
                         description:
-                          'Chỉ nhận cấp thư mục không quá 2 (hai thư mục chồng nhau)',
+                        'Chỉ nhận cấp thư mục không quá 2 (hai thư mục chồng nhau)',
                     });
                     setDataUpLoad([]);
                     return;
@@ -127,7 +134,8 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
             dem = 0;
             if(result1 !== result2){
                 const arr = filterFiles.filter((file)=>{
-                    return file.webkitRelativePath.includes(result1);
+                    //-----------------------------------------Đây là chỗ cho file vào mảng (dễ sai)
+                    return file.webkitRelativePath.includes(`${result1}/`);
                 })
                 array.push(arr);
                 Labels.push(result1);
@@ -140,37 +148,43 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
             })
             return {label: i , images: a};
         })
-        //set information up load
-        const info = [];
-        for(let i of result){
-            info.push({name: i.label, images: i.images.length});
-        } 
-        setInfo(info);
         //-------------------------
-        setTrain(true);
         setSpin(true);
         setDataUpLoad(result);
         checkRetrain(result);
         setTimeout(()=>{
             setSpin(false);
-            setSuccess("Folder was ready");
+            setVisible(true);
+            event.target.value = null;
         },1500)
     }
     //----------------------------------call train images when download face-api and set dataDetects
-    const handleTrain = () =>{
-    { 
+    const handleTrain = (data) =>{
+        if(data.length === 0){
+            notification.error({
+                message: 'Chưa chọn folder training !!!',
+            });
+        } else {
         setSpin(true);
         setTrainLoading("Training....");
-        setSuccess("");
-        const handle =  async ()=>{
+        Promise.all([
+            faceapi.nets.ssdMobilenetv1.load('/models')
+        ]).then( async(res)=>{
             const result = [];
-            const faceDetectPromise =  await handleTrainImages(dataUpLoad);
+            const faceDetectPromise =  await handleTrainImages(data);
+            console.log(faceDetectPromise);
             for(let i of faceDetectPromise[0]){
                 let a = await i ; 
-                result.push({faceID: shortID.generate(),label: a.label, faceDetects: a.faceDetects});
+                let CheckedFaceDetects = [];// các ảnh đã được lọc , nếu không có khuôn mặt thì bỏ qua
+                for(let i of a.faceDetects){
+                    if(i.length !==0){
+                        CheckedFaceDetects.push(i);
+                    }
+                }
+                result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects});
             }
             if(result.length === faceDetectPromise[0].length){
-                // push data to server
+               //push data to server
                 for(let i = 0 ; i < result.length ; i++){
                     let array = [];
                     for(let e of result[i].faceDetects){
@@ -179,85 +193,41 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
                     await recognitionApi.postRecognition({...result[i],
                         faceDetects: array})
                 }
+                //set information up load
+                const info = [];
+                for(let i of result){
+                    info.push({name: i.label, images: i.faceDetects.length, total: data.map((j)=>{if(i.label===j.label){return j.images.length}})});
+                } 
+                setInfo(info);
                 //-----------------------------------------------------
                 setSpin(false);
                 notification.success({
-                    message: 'Train thành công !!!',
+                    message: 'Train Hoàn Tất !!!',
                     description:
                         'Quá trình train hoàn tất !',
                 });
-                setTrain(false);
-                setTrainLoading('Train');
+                setTrainLoading('Choose folder to train');
                 setReload(!reload);
                 setReplay(true);
                 fetchFaceDetects();
                 checkRetrain(dataUpLoad);
             }
+        })
         }
-        handle();
     }
-}
     return (
         <>
-            <Modal
-            title="Modal"
-            centered
-            visible={visible}
-            onOk={()=>{hideModal();handleTrain()}}
-            onCancel={hideModal}
-            okText="ReTrain"
-            cancelText="Cancel"
-            >
-            {
-                dataExist.map((i,index)=>{
-                    return( <div className="list-item-exist">
-                        <div className="wrap-folder">
-                                <img src={Folder} alt=""></img>
-                                <p>{i.label}</p>
-                        </div>
-                        <div className='choose-folder'>
-                            <Checkbox onChange={onChange}></Checkbox>
-                        </div>
-                    </div>
-                    )
-                })
-            }
-        </Modal>
+            <ListRetrain 
+                dataExist={dataExist} handleTrain={handleTrain}  
+                dataNew={dataNew} setVisible={setVisible} visible={visible} ></ListRetrain>
             <div className='wrap-input'>
-                {
-                    train === false ?
-                    <>
-                    <Tooltip  placement="top" title='Chỉ nhận upload folder'>
-                        <label htmlFor='train'>Choose folder to train</label>
+                <Spin spinning={spin}>
+                    <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>
+                        <label htmlFor='train'>{trainLoading}</label>
                     </Tooltip>
                     <input onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
-                    <p>No folder was choice</p>
-                    </>
-                    : <>
-                        <Spin spinning={spin} className='spin'>
-                            <Tooltip  placement="top" title='*Lưu ý: Tên folder chứa ảnh sẽ được lấy làm tên nhận diện khuôn mặt!'>
-                                <Button 
-                                    onClick={()=>{
-                                        if(status.protect ==='false' ){
-                                            notification.error({
-                                                message: 'Yêu cầu đăng nhập trước khi trainning !!!',
-                                            });
-                                            history.push('/login');
-                                        } else{
-                                            if(dataExist.length!==0){
-                                                showModal();
-                                            } else{
-                                                handleTrain();
-                                            }
-                                        }
-                                        
-                                    }} 
-                                    type="primary">{trainLoading}</Button>
-                            </Tooltip> 
-                        </Spin>
-                            <p>{success}</p>
-                    </> 
-                }
+                </Spin>
+                <p>No folder was choice</p>
             </div>
         </>
     )

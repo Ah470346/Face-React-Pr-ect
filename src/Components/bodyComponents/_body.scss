@@ -26,18 +26,27 @@
             font-family: $fontFamily;;
             // @include flexBox(column,center,center);
 
+            & .search-folder {
+                width: 90%;
+                margin-bottom: 20px;
+                .anticon-search {
+                    margin-bottom: 5px;
+                    font-size: large;
+                }
+                
+            }
+
             & > p {
                 color: #000;
                 display: inline-block;
                 padding-bottom: 10px;
-                margin-bottom: 10px;
                 font-size: 1.2em;
-                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+                // border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
             }
 
             & .scroll-list {
                 width: 100%;
-                @include calc(height, '100% - 49px');
+                @include calc(height, '100% - 120px');
                 overflow-y:hidden;
 
                 & .list-item {

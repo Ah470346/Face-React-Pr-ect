@@ -6,4 +6,34 @@
      @import './headerComponents/header';
      @import './bodyComponents/body';
      @import './LoginComponent/login';
+
+     & .wrap-capture {
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+        padding-top: 30px;
+        @include flexBox(column,flex-start,center);
+
+        & .wrap-video {
+            position: relative;
+            width: 100%;
+            height: 70%;
+            border: 1px solid rgba($color: #000000, $alpha: 0.1);
+            margin-bottom: 20px;
+
+            & #video {
+                width: 100%;
+                height: 100%;
+            }
+            & #canvas{
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        
+     }
  }

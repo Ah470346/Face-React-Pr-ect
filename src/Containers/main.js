@@ -4,7 +4,8 @@ import {userLogin,fetchUser,clearLogin,fetchFaceDetect} from '../Actions/actionC
 
 const mapStateToProps = (state) =>({
     users: state.users,
-    status: state.status
+    status: state.status,
+    permission: state.permission
 });
 
 const mapActionToProps = (dispatch) =>({

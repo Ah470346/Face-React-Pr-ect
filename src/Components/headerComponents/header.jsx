@@ -10,18 +10,22 @@ import {
     Link
 } from "react-router-dom";
 import {useSelector,useDispatch} from 'react-redux';
-import {clearLogin,fetchFaceDetect} from '../../Actions/actionCreators';
+import {clearLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
+import {isMobile} from 'react-device-detect';
 
 function Header(props) {
     const dispatch = useDispatch();
     const clearStatus = () => dispatch(clearLogin());
     const fetchFace = () => dispatch(fetchFaceDetect());
+    const setPermis = (user) => dispatch(setPermission(user));
     const status = useSelector(state => state.status);;
     const signOut = ()=>{
         localStorage.removeItem('username');
         localStorage.removeItem('password');
         localStorage.removeItem('remember');
+        localStorage.removeItem('permission');
         localStorage.setItem('protect', false);
+        setPermis({permission: ""});
         clearStatus();
     } 
     return (
@@ -30,6 +34,8 @@ function Header(props) {
                 <NavbarBrand className="header-brand" href="/">
                     <img width='84' height='37' alt="" src={Logo}></img>
                 </NavbarBrand>
+
+                { isMobile === false && <>
                 <Nav className="mr-auto" navbar>
                     <NavItem>
                         <Link onClick={fetchFace} className='nav-link' to="/">Home</Link>
@@ -43,7 +49,8 @@ function Header(props) {
                         }
                         
                     </NavItem>
-                </Nav>
+                </Nav></>
+                }
             </Navbar>
         </div>
     )

@@ -4,7 +4,7 @@
 
     & .VBPO-header {
         height: 100%;
-        background-color: rgb(230, 222, 222) !important;
+        background-color: rgb(25, 195, 238) !important;
         & .header-brand {
             margin-left: 10px;
         }
@@ -16,4 +16,20 @@
     }
 
     
+}
+
+@media all and (max-height:900px){
+    .wrap-header {
+        height: 7.5%;
+    }
+}
+@media all and (max-height:780px){
+    .wrap-header {
+        height: 8%;
+    }
+}
+@media all and (max-height:700px){
+    .wrap-header {
+        height: 10%;
+    }
 }

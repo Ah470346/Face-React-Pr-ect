@@ -25,7 +25,6 @@ function Body(props) {
     const dispatch = useDispatch();
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
     // spin load models
-    // const [loadModels, setLoadModels] = useState(false);
     const [openCamVideo, setOpenCamVideo] = useState(false);
     const [recognition, setRecognition] = useState(false);
     const [reload,setReload] = useState(false);
@@ -34,6 +33,7 @@ function Body(props) {
     const [info,setInfo] = useState([]);
     const elVideo = useRef();
     const faceDescriptions = useSelector(state => state.faceDetect);
+    const permission = useSelector(state => state.permission);
     console.log(faceDescriptions);
 
     // replay canvas when update train
@@ -100,14 +100,13 @@ function Body(props) {
         loadModal();
     },[reload]);
     return (
-        // <Spin style={{height:'100%'}} spinning={loadModels} className='spin-body' tip='Loading models...'>
         <div className="wrap-body">
             <div className={'wrap-list-train'}>
                 <ListTrain></ListTrain>
             </div>
             <div className='wrap-recognition'>
                 <div className='wrap-button'>
-                    <InputFile setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>
+                    {permission.permission === "admin" && <InputFile setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>}
                     {recognition === false
                     ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Face Recognition</Button>)
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)
@@ -131,7 +130,6 @@ function Body(props) {
             </div>
             {showModal === true && <TrainStatus info={info} setInfo={setInfo} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
         </div>
-        // </Spin>
     )
 }
 

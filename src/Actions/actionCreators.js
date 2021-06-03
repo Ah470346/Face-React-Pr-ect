@@ -5,6 +5,7 @@ export const LOAD_USER = 'LOAD_USER';
 export const USER_LOGIN = 'USER_LOGIN';
 export const CLEAR_LOGIN = 'CLEAR_LOGIN';
 export const LOAD_FACE_DETECT = "LOAD_FACE_DETECT";
+export const SET_PERMISSION = "SET_PERMISSION";
 
 
 
@@ -25,6 +26,13 @@ export const loadFaceDetect = (faces)=>{
 export const clearLogin = () =>{
     return {
         type:CLEAR_LOGIN
+    }
+}
+
+export const setPermission = (user) =>{
+    return {
+        type:SET_PERMISSION,
+        data: user
     }
 }
 
