@@ -26,13 +26,27 @@
                 height: 100%;
             }
             & #canvas{
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
+                @include absoluteCenter(both);
+                z-index: 11;
+            }
+            & #image{
+                z-index: 1;
+                @include absoluteCenter(both);
             }
         }
+        & .wrap-button{
+            width: 100%;
+            flex-direction: row !important;
+            @include flexBox(column,space-around,center);
+
+            button {
+                width: 28%;
+            }
+            .button-recognition {
+                width: 100%;
+            }
+        } 
+
 
         
      }

@@ -22,7 +22,7 @@ function Main({fetchUser,status,fetchFaceDetect,permission}) {
           await faceapi.nets.tinyFaceDetector.load('/models');
           await faceapi.nets.faceRecognitionNet.load('/models');
       } 
-      // fetchModels();
+      fetchModels();
     },[fetchUser]);
     return (
         <Router>
