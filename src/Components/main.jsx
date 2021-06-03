@@ -34,9 +34,9 @@ function Main({fetchUser,status,fetchFaceDetect,permission}) {
                     <ProtectLoginRoute exact path="/login" protect={status.protect}>
                         <Login/>
                     </ProtectLoginRoute>
-                    <Route exact path="/" permission={permission.permission}>
+                    <ProtectHomeRoute exact path="/" permission={permission.permission}>
                         <Body/>
-                    </Route>
+                    </ProtectHomeRoute>
                   </Switch>
                   : <CaptureMobile></CaptureMobile>
                 }
