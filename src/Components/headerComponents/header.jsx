@@ -38,7 +38,10 @@ function Header(props) {
                 { isMobile === false && <>
                 <Nav className="mr-auto" navbar>
                     <NavItem>
-                        <Link onClick={fetchFace} className='nav-link' to="/">Home</Link>
+                        <Link onClick={fetchFace} className='nav-link' to="/home">Home</Link>
+                    </NavItem>
+                    <NavItem>
+                        <Link onClick={fetchFace} className='nav-link' to="/">Test</Link>
                     </NavItem>
                 </Nav>
                 <Nav className="mr-auto sign-in" navbar>

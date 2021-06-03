@@ -47,6 +47,15 @@
             }
         } 
 
+        & .wrap-button.desktop {
+            @include flexBox(column,center,center);
+            button {
+                width: 10%;
+                height: 40px;
+                margin-right: 30px;
+            }
+        }
+
 
         
      }

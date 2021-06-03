@@ -44,7 +44,7 @@ function Login(props) {
                 localStorage.setItem('permission',response);
                 setPermis({permission: response});
                 fetchFace();
-                history.push('/'); 
+                history.push('/home'); 
             }
         } catch (e) {
             if (e.response && e.response.data) {

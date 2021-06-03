@@ -11,6 +11,7 @@ import {
 import * as faceapi from 'face-api.js';
 import {isMobile} from 'react-device-detect';
 import CaptureMobile from './CaptureMobile';
+import CaptureDesktop from './CaptureDesktop';
 
 function Main({fetchUser,status,fetchFaceDetect,permission}) {
     useEffect(()=>{
@@ -31,10 +32,13 @@ function Main({fetchUser,status,fetchFaceDetect,permission}) {
                 {
                   isMobile === false ?
                    <Switch>
+                    <Route exact path="/">
+                      <CaptureDesktop></CaptureDesktop>
+                    </Route>
                     <ProtectLoginRoute exact path="/login" protect={status.protect}>
                         <Login/>
                     </ProtectLoginRoute>
-                    <ProtectHomeRoute exact path="/" permission={permission.permission}>
+                    <ProtectHomeRoute exact path="/home" permission={permission.permission}>
                         <Body/>
                     </ProtectHomeRoute>
                   </Switch>
@@ -53,7 +57,7 @@ const ProtectLoginRoute = ({protect,children,...rest})=>{
           children
         ):
           (
-            <Redirect to='/'></Redirect>
+            <Redirect to='/home'></Redirect>
           )
         }
       />
