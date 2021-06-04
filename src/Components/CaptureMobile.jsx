@@ -78,7 +78,7 @@ function CaptureMobile(props) {
             width = vd.current.offsetWidth;
             height = vd.current.offsetWidth * tile;
         }
-        canvas.setAttribute('width',vd.current.offsetWidth);
+        canvas.setAttribute('width',width);
         canvas.setAttribute('height', height);
         ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0,0, canvas.width, canvas.height);
