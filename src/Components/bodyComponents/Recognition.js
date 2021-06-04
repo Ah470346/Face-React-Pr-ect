@@ -9,7 +9,7 @@ const labeledDescriptors = (descriptions) => {
     });
 }
 
-export const handlePlay = (vd,faceDescriptions) =>{
+export const handlePlay = (vd,faceDescriptions,width,height) =>{
     const video = document.getElementById('video');
     const wrapVideo = document.getElementById('wrap-video');
     const CurrentCanvas = document.getElementsByTagName('canvas');
@@ -27,7 +27,7 @@ export const handlePlay = (vd,faceDescriptions) =>{
         faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
     }
 
-    const displaySize = {width: vd.current.offsetWidth,height: vd.current.offsetHeight };
+    const displaySize = {width,height};
     faceapi.matchDimensions(canvas,displaySize);
     setInterval(async()=>{
         

@@ -31,6 +31,7 @@ function Body(props) {
     const [replay,setReplay] = useState(false);
     const [showModal,setShowModal] = useState(false);
     const [info,setInfo] = useState([]);
+    const [metadata,setMetadata] = useState("");
     const elVideo = useRef();
     const faceDescriptions = useSelector(state => state.faceDetect);
     const permission = useSelector(state => state.permission);
@@ -77,19 +78,24 @@ function Body(props) {
           }); // always check for errors at the end.
     }
     const stop = (video) => {
-        const stream = video.current.srcObject;
-        const tracks = stream.getTracks();
-        const canvas = document.getElementsByTagName('canvas');
-        const wrapVideo = document.getElementById('wrap-video');
-        wrapVideo.removeChild(canvas[0])
-        tracks.forEach(function(track) {
-            track.stop();
-        });
+        if(video.current !==undefined && video.current !== null){
+            const stream = video.current.srcObject;
+            if(stream !== null){
+                const tracks = stream.getTracks();
+                const canvas = document.getElementsByTagName('canvas');
+                const wrapVideo = document.getElementById('wrap-video');
+                wrapVideo.removeChild(canvas[0])
+                tracks.forEach(function(track) {
+                    track.stop();
+                });
 
-        video.current.srcObject = null;
+                video.current.srcObject = null;
+                
+                setOpenCamVideo(false);
+                setRecognition(false);
+            }
+        }
         
-        setOpenCamVideo(false);
-        setRecognition(false);
     }
     useEffect(()=>{
         const loadModal = ()=>{
@@ -101,12 +107,14 @@ function Body(props) {
     },[reload]);
     return (
         <div className="wrap-body">
-            <div className={'wrap-list-train'}>
-                <ListTrain></ListTrain>
+            <div className="side-bar">
+                <div className='wrap-list-train'>
+                    <ListTrain></ListTrain>
+                </div>
             </div>
             <div className='wrap-recognition'>
                 <div className='wrap-button'>
-                    {permission.permission === "admin" && <InputFile setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>}
+                    {permission.permission === "admin" && <InputFile onClick={()=>stop(elVideo)} setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>}
                     {recognition === false
                     ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Face Recognition</Button>)
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)
@@ -115,7 +123,17 @@ function Body(props) {
                 <div id="wrap-video" className='wrap-video' >
                     { openCamVideo === true ? (
                     <>
-                        <video playsInline autoPlay muted type='video/mp4' width="720" height="560" id="video" onPlay={()=>{handlePlay(elVideo,faceDescriptions)}} ref={elVideo}></video>
+                        <video 
+                            playsInline autoPlay muted 
+                            type='video/mp4' width="720" height="560" id="video" 
+                            onPlay={()=>{handlePlay(elVideo,faceDescriptions,metadata.videoWidth,metadata.videoHeight)}} 
+                            ref={elVideo} onLoadedMetadata={e => {
+                                setMetadata({
+                                  videoHeight: e.target.videoHeight,
+                                  videoWidth: e.target.videoWidth,
+                                  duration: e.target.duration
+                                });
+                              }}></video>
                     </>
                     )
                     :

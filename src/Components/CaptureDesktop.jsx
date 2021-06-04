@@ -96,7 +96,12 @@ function CaptureDesktop(props) {
     
         var data = canvas.toDataURL('image/png');
         photo.setAttribute('src', data);
-        setOpenCam("2");
+        console.log("heelo",openCam);
+        if(openCam === "1"){
+            setOpenCam("1");
+        } else {
+            setOpenCam("2");
+        }
       }
     const stop = (video) => {
         const stream = video.current.srcObject;

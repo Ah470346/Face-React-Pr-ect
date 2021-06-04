@@ -10,7 +10,7 @@ import ListRetrain from './listRetrain';
 import * as faceapi from 'face-api.js';
 
 
-function InputFile({setReload,reload,setReplay,setInfo}) {
+function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
     const dispatch = useDispatch();
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
 
@@ -77,6 +77,7 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
     }
     //----------------------------------handler when up load files 
     const handleUpLoad = (event) => {
+        onClick();
         fetchFaceDetects();
         setSpin(true);
         const files = Object.values(event.target.files);
@@ -227,7 +228,6 @@ function InputFile({setReload,reload,setReplay,setInfo}) {
                     </Tooltip>
                     <input onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
                 </Spin>
-                <p>No folder was choice</p>
             </div>
         </>
     )

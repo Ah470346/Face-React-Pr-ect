@@ -1,5 +1,6 @@
 
 .wrap-body {
+    height: 93.5%;
     position: relative;
     @include flexBox(row,center);
 
@@ -8,71 +9,79 @@
         padding: 0;
         color: rgb(141, 137, 137);
     }
-
-    & .wrap-list-train {
+    & .side-bar{
         position: absolute;
-        width: 20%;
-        height: 745px;
         left: 0;
         top: 0;
-        padding-top: 40px;
-        padding-left: 20px;
-        padding-bottom: 20px;
+        width: 19%;
+        margin-top: 10px;
+        height: 665px;
+        box-shadow: 1px 0px 2px rgba($color: #000000, $alpha: 0.1);
+        border-radius: 0px 3px 0 0;
+        background-color: rgb(221, 246, 248);
+        
 
-        & .list-train{
+        & .wrap-list-train {
             width: 100%;
             height: 100%;
-            padding-top: 10px;
-            font-family: $fontFamily;;
-            // @include flexBox(column,center,center);
-
-            & .search-folder {
-                width: 90%;
-                margin-bottom: 20px;
-                .anticon-search {
-                    margin-bottom: 5px;
-                    font-size: large;
-                }
-                
-            }
-
-            & > p {
-                color: #000;
-                display: inline-block;
-                padding-bottom: 10px;
-                font-size: 1.2em;
-                // border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
-            }
-
-            & .scroll-list {
+            padding-top: 40px;
+            padding-left: 20px;
+    
+            & .list-train{
                 width: 100%;
-                @include calc(height, '100% - 120px');
-                overflow-y:hidden;
-
-                & .list-item {
-                    @include flexBox(row,flex-start, center);
-                    padding: 5px 10px;
-                    cursor: pointer;
-                    img{
-                        margin-right: 10px;
+                height: 100%;
+                padding-top: 10px;
+                font-family: $fontFamily;;
+                // @include flexBox(column,center,center);
+    
+                & .search-folder {
+                    width: 90%;
+                    margin-bottom: 20px;
+                    .anticon-search {
+                        margin-bottom: 5px;
+                        font-size: large;
                     }
-                    p {
-                        color: #1a1a1a;
-                        font-size: 1.1em;
+                    
+                }
+    
+                & > p {
+                    color: #000;
+                    display: inline-block;
+                    padding-bottom: 10px;
+                    font-size: 1.2em;
+                    // border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+                }
+    
+                & .scroll-list {
+                    width: 100%;
+                    @include calc(height, '100% - 120px');
+                    overflow-y:hidden;
+    
+                    & .list-item {
+                        @include flexBox(row,flex-start, center);
+                        padding: 5px 10px;
+                        cursor: pointer;
+                        img{
+                            margin-right: 10px;
+                        }
+                        p {
+                            color: #1a1a1a;
+                            font-size: 1.1em;
+                        }
                     }
                 }
+    
+                & .scroll-list:hover {
+                    overflow-y:auto;
+                }
             }
-
-            & .scroll-list:hover {
-                overflow-y:auto;
-            }
+    
         }
-
     }
-
     & .wrap-recognition {
         padding-top: 40px;
-        padding-bottom: 20px;
+        height: 685px;
+        padding-bottom: 10px;
         width: 60%;
 
 
@@ -120,16 +129,14 @@
 
         & .wrap-video {
             position: relative;
-            margin: 50px 20px 10px 20px;
-            padding: 5px;
+            margin: 20px 20px 0px 20px;
+            padding: 5px 5px 0 5px;
             height: 570px;
             border: 1px solid rgba($color: #000000, $alpha: 0.1);
             @include flexBox(row,center,center);
 
             & canvas {
                 position: absolute;
-            }
-            & video {
             }
 
             & .signal{

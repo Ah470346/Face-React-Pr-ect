@@ -1,12 +1,11 @@
-import React,{useEffect} from 'react';
+import React,{useEffect,useState} from 'react';
 import Header from './headerComponents/header';
 import Body from './bodyComponents/body';
 import Login from './LoginComponent/login';
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
-    Redirect
+    Redirect,
 } from "react-router-dom";
 import * as faceapi from 'face-api.js';
 import {isMobile} from 'react-device-detect';
@@ -26,26 +25,24 @@ function Main({fetchUser,status,fetchFaceDetect,permission}) {
       fetchModels();
     },[fetchUser]);
     return (
-        <Router>
-            <div className='main'>
-                <Header></Header>
-                {
-                  isMobile === false ?
-                   <Switch>
-                    <Route exact path="/">
-                      <CaptureDesktop></CaptureDesktop>
-                    </Route>
-                    <ProtectLoginRoute exact path="/login" protect={status.protect}>
-                        <Login/>
-                    </ProtectLoginRoute>
-                    <ProtectHomeRoute exact path="/home" permission={permission.permission}>
-                        <Body/>
-                    </ProtectHomeRoute>
-                  </Switch>
-                  : <CaptureMobile></CaptureMobile>
-                }
-            </div>
-        </Router>
+        <div className='main'>
+            <Header></Header>
+            {
+              isMobile === false ?
+                <Switch>
+                <Route exact path="/">
+                  <CaptureDesktop></CaptureDesktop>
+                </Route>
+                <Route exact path="/login">
+                    <Login/>
+                </Route>
+                <ProtectHomeRoute exact path="/home" permission={permission.permission}>
+                    <Body/>
+                </ProtectHomeRoute>
+              </Switch>
+              : <CaptureMobile></CaptureMobile>
+            }
+        </div>
     )
 }
 
