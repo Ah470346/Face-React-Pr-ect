@@ -52,17 +52,31 @@ function CaptureMobile(props) {
     const snapshot = (vd)=>{
         const tile = metadata.videoWidth/metadata.videoHeight;
         let height ,width ;
-        if(metadata.videoWidth < vd.current.offsetWidth && metadata.videoHeight < vd.current.offsetHeight){
+         // width and height  của video đều nhỏ hơn ô chứa
+         if(metadata.videoWidth < vd.current.offsetWidth && metadata.videoHeight < vd.current.offsetHeight){
             height = metadata.videoHeight;
             width = metadata.videoWidth;
         }
-        else if(tile > 1){
+        // width của video lớn hơn ô chứa và tỉ lệ width/height > 1
+        else if(tile > 1 && metadata.videoWidth > vd.current.offsetWidth){
             height = vd.current.offsetWidth / tile;
             width = vd.current.offsetWidth;
-        } else {
+        } 
+        // height của video lớn hơn ô chứa và tỉ lệ width/height < 1
+        else if(tile < 1 && metadata.videoHeight > vd.current.offsetHeight){
             const t = metadata.videoHeight/metadata.videoWidth;
             width = vd.current.offsetHeight/t;
             height = vd.current.offsetHeight;
+        }
+        // height của video lớn hơn ô chứa, width nhỏ hơn ô chứa và tỉ lệ width/height > 1
+        else if (tile > 1 && metadata.videoWidth < vd.current.offsetWidth){
+            width = vd.current.offsetHeight * tile;
+            height = vd.current.offsetHeight;
+        }
+        // width của video lớn hơn ô chứa, height nhỏ hơn ô chứa và tỉ lệ width/height < 1
+        else if (tile < 1 && metadata.videoHeight < vd.current.offsetHeight){
+            width = vd.current.offsetWidth;
+            height = vd.current.offsetWidth * tile;
         }
         canvas.setAttribute('width',vd.current.offsetWidth);
         canvas.setAttribute('height', height);
@@ -89,6 +103,8 @@ function CaptureMobile(props) {
         if (stream !== null){
             var context = canvas.getContext('2d');
             context.clearRect(0, 0, canvas.width, canvas.height);
+            var data = canvas.toDataURL('image/png');
+            photo.setAttribute('src', data);
             const tracks = stream.getTracks();
             tracks.forEach(function(track) {
                 track.stop();
@@ -107,41 +123,38 @@ function CaptureMobile(props) {
     }
     const handleImage = async (width,height,faceDescriptions,image) =>{
         setSpin(true);
-        let faceMatcher = [];
-        if(faceDescriptions.length !== 0){
-            faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
-        }
+        setTimeout(async ()=>{
+            let faceMatcher = [];
+            if(faceDescriptions.length !== 0){
+                faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+            }
 
-        const displaySize = {width: width, height:height };
-        faceapi.matchDimensions(canvas,displaySize);
+            const displaySize = {width: width, height:height };
+            faceapi.matchDimensions(canvas,displaySize);
 
 
 
-        const detections = await faceapi.detectAllFaces(image)
-            .withFaceLandmarks().withFaceDescriptors();
-        const resizeDetections = faceapi.resizeResults(detections,displaySize);
+            const detections = await faceapi.detectAllFaces(image)
+                .withFaceLandmarks().withFaceDescriptors();
+            const resizeDetections = faceapi.resizeResults(detections,displaySize);
 
-        if(faceMatcher.length === 0){
-            resizeDetections.forEach((r,i)=>{
-                const box = resizeDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box,{label: "unknown"});
-                setTimeout(()=>{
-                    drawBox.draw(canvas);
+            if(faceMatcher.length === 0){
+                resizeDetections.forEach((r,i)=>{
+                    const box = resizeDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box,{label: "unknown"});
                     setSpin(false);
-                },1500);
-            })
-        } else if(faceMatcher.length !== 0){
-            const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));            
-            results.forEach((r,i)=>{
-                const box = resizeDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box,{label: r.label});
-                setTimeout(()=>{
                     drawBox.draw(canvas);
+                })
+            } else if(faceMatcher.length !== 0){
+                const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));            
+                results.forEach((r,i)=>{
+                    const box = resizeDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box,{label: r.label});
                     setSpin(false);
-                },1500);
-            })
-        }
-
+                    drawBox.draw(canvas);
+                })
+            }
+        },100);
     }
     return (
         <div className="wrap-capture">

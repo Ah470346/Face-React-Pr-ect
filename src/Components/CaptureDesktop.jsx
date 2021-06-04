@@ -11,7 +11,6 @@ function CaptureDesktop(props) {
     const [size, setSize] = useState(null);
     const faceDescriptions = useSelector(state => state.faceDetect);
 
-    console.log(size);
 
     let canvas , ctx,video ,photo;
     video = document.getElementById("video");
@@ -51,20 +50,35 @@ function CaptureDesktop(props) {
     }
     const snapshot = (vd)=>{
         const tile = metadata.videoWidth/metadata.videoHeight;
+        console.log(metadata.videoWidth,metadata.videoHeight,tile);
         let height ,width ;
+        // width and height  của video đều nhỏ hơn ô chứa
         if(metadata.videoWidth < vd.current.offsetWidth && metadata.videoHeight < vd.current.offsetHeight){
             height = metadata.videoHeight;
             width = metadata.videoWidth;
         }
-        else if(tile > 1){
+        // width của video lớn hơn ô chứa và tỉ lệ width/height > 1
+        else if(tile > 1 && metadata.videoWidth > vd.current.offsetWidth){
             height = vd.current.offsetWidth / tile;
             width = vd.current.offsetWidth;
-        } else {
+        } 
+        // height của video lớn hơn ô chứa và tỉ lệ width/height < 1
+        else if(tile < 1 && metadata.videoHeight > vd.current.offsetHeight){
             const t = metadata.videoHeight/metadata.videoWidth;
             width = vd.current.offsetHeight/t;
             height = vd.current.offsetHeight;
         }
-        canvas.setAttribute('width',vd.current.offsetWidth);
+        // height của video lớn hơn ô chứa, width nhỏ hơn ô chứa và tỉ lệ width/height > 1
+        else if (tile > 1 && metadata.videoWidth < vd.current.offsetWidth){
+            width = vd.current.offsetHeight * tile;
+            height = vd.current.offsetHeight;
+        }
+        // width của video lớn hơn ô chứa, height nhỏ hơn ô chứa và tỉ lệ width/height < 1
+        else if (tile < 1 && metadata.videoHeight < vd.current.offsetHeight){
+            width = vd.current.offsetWidth;
+            height = vd.current.offsetWidth * tile;
+        }
+        canvas.setAttribute('width',width);
         canvas.setAttribute('height', height);
         ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0,0, canvas.width, canvas.height);
@@ -89,6 +103,8 @@ function CaptureDesktop(props) {
         if (stream !== null){
             var context = canvas.getContext('2d');
             context.clearRect(0, 0, canvas.width, canvas.height);
+            var data = canvas.toDataURL('image/png');
+            photo.setAttribute('src', data);
             const tracks = stream.getTracks();
             tracks.forEach(function(track) {
                 track.stop();
@@ -105,47 +121,44 @@ function CaptureDesktop(props) {
             return face;
         });
     }
-    const handleImage = async (width,height,faceDescriptions,image) =>{
+    const handleImage = (width,height,faceDescriptions,image) =>{
         setSpin(true);
-        let faceMatcher = [];
-        if(faceDescriptions.length !== 0){
-            faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
-        }
+        setTimeout(async ()=>{
+            let faceMatcher = [];
+            if(faceDescriptions.length !== 0){
+                faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+            }
 
-        const displaySize = {width: width, height:height };
-        faceapi.matchDimensions(canvas,displaySize);
+            const displaySize = {width: width, height:height };
+            faceapi.matchDimensions(canvas,displaySize);
 
 
 
-        const detections = await faceapi.detectAllFaces(image)
-            .withFaceLandmarks().withFaceDescriptors();
-        const resizeDetections = faceapi.resizeResults(detections,displaySize);
+            const detections = await faceapi.detectAllFaces(image)
+                .withFaceLandmarks().withFaceDescriptors();
+            const resizeDetections = faceapi.resizeResults(detections,displaySize);
 
-        if(faceMatcher.length === 0){
-            resizeDetections.forEach((r,i)=>{
-                const box = resizeDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box,{label: "unknown"});
-                setTimeout(()=>{
-                    drawBox.draw(canvas);
+            if(faceMatcher.length === 0){
+                resizeDetections.forEach((r,i)=>{
+                    const box = resizeDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box,{label: "unknown"});
                     setSpin(false);
-                },1500);
-            })
-        } else if(faceMatcher.length !== 0){
-            const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));            
-            results.forEach((r,i)=>{
-                const box = resizeDetections[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box,{label: r.label});
-                setTimeout(()=>{
                     drawBox.draw(canvas);
+                })
+            } else if(faceMatcher.length !== 0){
+                const results = resizeDetections.map(d => faceMatcher.findBestMatch(d.descriptor));            
+                results.forEach((r,i)=>{
+                    const box = resizeDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box,{label: r.label});
                     setSpin(false);
-                },1500);
-            })
-        }
-
+                    drawBox.draw(canvas);
+                })
+            }
+        },100);
     }
     return (
-        <div className="wrap-capture container">
-            <div className="wrap-video">
+        <div className="wrap-capture  container">   
+            <div className="wrap-video desktop">
                 <video 
                     ref={elVideo} 
                     playsInline autoPlay muted 
@@ -164,13 +177,13 @@ function CaptureDesktop(props) {
                {openCam === "1" && <Button onClick={()=>streamCamVideo(elVideo)} type="primary">Mở Camera</Button>}
                {openCam === "2" && <Button onClick={()=>snapshot(elVideo)} type="primary">Chụp Ảnh</Button>}
                {openCam === "3" &&
-                <Spin spinning={spin}> 
+                <Spin className="spin" spinning={spin}> 
                     <Button className="button-recognition desktop" 
                             onClick={()=>handleImage(size.width,size.height,faceDescriptions,photo)} 
                             type="primary">Nhận Diện</Button>
                 </Spin>}
                <Button onClick={()=>stop(elVideo)} danger type="primary">Stop Camera</Button>
-               <Button onClick={()=>clearPhoto()} type="primary">Clear</Button>
+               <Button onClick={()=>clearPhoto()} type="primary" className="clear">Clear</Button>
             </div>
             
         </div>
