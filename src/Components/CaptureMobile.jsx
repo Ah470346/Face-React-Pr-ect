@@ -1,7 +1,8 @@
 import React,{useState,useRef} from 'react';
 import { Button ,notification,Spin} from 'antd';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import * as faceapi from 'face-api.js';
+import {fetchFaceDetect} from '../Actions/actionCreators';
 
 function CaptureMobile(props) {
     const [openCam,setOpenCam] = useState("1");
@@ -9,14 +10,39 @@ function CaptureMobile(props) {
     const [spin,setSpin] = useState(false);
     const [metadata, setMetadata] = useState(null);
     const [size, setSize] = useState(null);
+    const dispatch = useDispatch();
+    const fetchFaceDetects = ()=> dispatch(fetchFaceDetect);
     const faceDescriptions = useSelector(state => state.faceDetect);
-
-    console.log(size);
 
     let canvas , ctx,video ,photo;
     video = document.getElementById("video");
     canvas = document.getElementById("canvas");
     photo = document.getElementById("image");
+
+    const offCam = (video)=>{
+        const stream = video.current.srcObject;
+        if (stream !== null){
+            const tracks = stream.getTracks();
+            tracks.forEach(function(track) {
+                track.stop();
+            });
+    
+            video.current.srcObject = null;
+        }
+    }
+    const startCam = (video)=>{
+        if(openCam!=="1" && openCam !== "2"){
+            const constraints = {audio : false,video : true};
+            navigator.mediaDevices
+            .getUserMedia(constraints)
+            .then(function(mediaStream) {
+                video.current.srcObject = mediaStream;
+                video.current.onloadedmetadata = function(e) {
+                    video.current.play();
+                };
+            })
+        }
+    }
 
 
     const streamCamVideo = (video) => {
@@ -50,6 +76,7 @@ function CaptureMobile(props) {
         // always check for errors at the end.
     }
     const snapshot = (vd)=>{
+        fetchFaceDetects();
         const tile = metadata.videoWidth/metadata.videoHeight;
         let height ,width ;
          // width and height  của video đều nhỏ hơn ô chứa
@@ -86,11 +113,13 @@ function CaptureMobile(props) {
         setSize({width,height});
         setOpenCam("3");
         let data = canvas.toDataURL('image/png');
-        photo.setAttribute('src', data);
         photo.setAttribute('width',width);
         photo.setAttribute('height', height);
+        photo.setAttribute('src', data);
+        offCam(elVideo);
     }
     function clearPhoto() {
+        startCam(elVideo);
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -104,19 +133,19 @@ function CaptureMobile(props) {
       }
     const stop = (video) => {
         const stream = video.current.srcObject;
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        var data = canvas.toDataURL('image/png');
+        photo.setAttribute('src', data);
         if (stream !== null){
-            var context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            var data = canvas.toDataURL('image/png');
-            photo.setAttribute('src', data);
             const tracks = stream.getTracks();
             tracks.forEach(function(track) {
                 track.stop();
             });
     
             video.current.srcObject = null;
-            setOpenCam("1");
         }
+        setOpenCam("1");
     }
     //--------------------------------------------return detect
     const labeledDescriptors = (descriptions) => {
@@ -130,7 +159,7 @@ function CaptureMobile(props) {
         setTimeout(async ()=>{
             let faceMatcher = [];
             if(faceDescriptions.length !== 0){
-                faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+                faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.42);
             }
 
             const displaySize = {width: width, height:height };
@@ -186,7 +215,7 @@ function CaptureMobile(props) {
                             onClick={()=>handleImage(size.width,size.height,faceDescriptions,photo)} 
                             type="primary">Nhận Diện</Button>
                 </Spin>}
-               <Button onClick={()=>stop(elVideo)} type="primary">Stop Camera</Button>
+               <Button onClick={()=>stop(elVideo)} danger type="primary">Stop Cam</Button>
                <Button onClick={()=>clearPhoto()} type="primary">Clear</Button>
             </div>
             
