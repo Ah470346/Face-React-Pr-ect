@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cycjimmy/jsmpeg-player": "^5.0.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
@@ -17,7 +18,9 @@
     "cross-env": "^7.0.3",
     "dotenv": "^9.0.2",
     "face-api.js": "^0.22.2",
+    "ffmpeg": "0.0.4",
     "node": "^16.1.0",
+    "node-rtsp-stream": "0.0.9",
     "node-sass": "^6.0.0",
     "query-string": "^7.0.0",
     "react": "^17.0.2",

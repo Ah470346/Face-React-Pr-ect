@@ -1,6 +1,7 @@
 import React,{useEffect,useState} from 'react';
 import Header from './headerComponents/header';
 import Body from './bodyComponents/body';
+import Rtsp from './bodyComponents/RTSP/RtspCam';
 import Login from './LoginComponent/login';
 import {
     Switch,
@@ -38,6 +39,9 @@ function Main({fetchUser,status,fetchFaceDetect,permission}) {
                 </ProtectLoginRoute>
                 <ProtectHomeRoute exact path="/home" permission={permission.permission}>
                     <Body/>
+                </ProtectHomeRoute>
+                <ProtectHomeRoute exact path="/rtsp" permission={permission.permission}>
+                    <Rtsp/>
                 </ProtectHomeRoute>
               </Switch>
               : <CaptureMobile></CaptureMobile>

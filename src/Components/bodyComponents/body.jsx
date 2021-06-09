@@ -1,7 +1,6 @@
 import React, {useState  ,useRef,useEffect} from 'react';
 import { Button ,notification} from 'antd';
 import * as canvas from 'canvas';
-// import '@tensorflow/tfjs-node';
 import {useSelector,useDispatch} from 'react-redux';
 import {fetchFaceDetect} from '../../Actions/actionCreators';
 import * as faceapi from 'face-api.js';

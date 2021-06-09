@@ -43,6 +43,9 @@ function Header(props) {
                     <NavItem>
                         <Link onClick={fetchFace} className='nav-link' to="/">Test</Link>
                     </NavItem>
+                    <NavItem>
+                        <Link onClick={fetchFace} className='nav-link' to="/rtsp">Stream</Link>
+                    </NavItem>
                 </Nav>
                 <Nav className="mr-auto sign-in" navbar>
                     <NavItem>

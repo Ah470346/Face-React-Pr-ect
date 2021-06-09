@@ -14,8 +14,8 @@ export const handlePlay = (vd,faceDescriptions,width,height) =>{
     const wrapVideo = document.getElementById('wrap-video');
     const CurrentCanvas = document.getElementsByTagName('canvas');
     const canvas = faceapi.createCanvasFromMedia(video);
-    if(CurrentCanvas.length !== 0){
-        wrapVideo.replaceChild(canvas,CurrentCanvas[0]);
+    if(CurrentCanvas.length > 1){
+        wrapVideo.replaceChild(canvas,CurrentCanvas[1]);
     } else{
         wrapVideo.appendChild(canvas);
     }
@@ -61,6 +61,6 @@ export const handlePlay = (vd,faceDescriptions,width,height) =>{
                 drawBox.draw(canvas);
             })
         }
-    },150);
+    },500);
 
 }
