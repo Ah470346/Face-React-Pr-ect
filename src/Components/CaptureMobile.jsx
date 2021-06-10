@@ -46,6 +46,7 @@ function CaptureMobile(props) {
 
 
     const streamCamVideo = (video) => {
+        fetchFaceDetects();
         const constraints = {audio : false,video : true};
         navigator.mediaDevices
         .getUserMedia(constraints)
@@ -119,6 +120,7 @@ function CaptureMobile(props) {
         offCam(elVideo);
     }
     function clearPhoto() {
+        fetchFaceDetects();
         startCam(elVideo);
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -132,6 +134,7 @@ function CaptureMobile(props) {
         }
       }
     const stop = (video) => {
+        fetchFaceDetects();
         const stream = video.current.srcObject;
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -155,6 +158,7 @@ function CaptureMobile(props) {
         });
     }
     const handleImage = async (width,height,faceDescriptions,image) =>{
+        fetchFaceDetects();
         setSpin(true);
         setTimeout(async ()=>{
             let faceMatcher = [];

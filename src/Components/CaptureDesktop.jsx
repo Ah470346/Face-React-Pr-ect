@@ -47,6 +47,7 @@ function CaptureDesktop(props) {
 
 
     const streamCamVideo = (video) => {
+        fetchFaceDetects()
         const constraints = {audio : false,video : true};
         navigator.mediaDevices
         .getUserMedia(constraints)
@@ -126,6 +127,7 @@ function CaptureDesktop(props) {
         offCam(elVideo);
     }
     function clearPhoto() {
+        fetchFaceDetects()
         startCam(elVideo);
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -139,6 +141,7 @@ function CaptureDesktop(props) {
         }
       }
     const stop = (video) => {
+        fetchFaceDetects();
         const stream = video.current.srcObject;
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -162,6 +165,7 @@ function CaptureDesktop(props) {
         });
     }
     const handleImage = (width,height,faceDescriptions,image) =>{
+        fetchFaceDetects();
         setSpin(true);
         Promise.all([
            faceapi.nets.tinyFaceDetector.load('/models')

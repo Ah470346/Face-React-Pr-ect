@@ -34,7 +34,6 @@ function Body(props) {
     const elVideo = useRef();
     const faceDescriptions = useSelector(state => state.faceDetect);
     const permission = useSelector(state => state.permission);
-    console.log(faceDescriptions);
 
     // replay canvas when update train
     if(faceDescriptions!== undefined && faceDescriptions.length!==0 && replay ===true){
@@ -125,7 +124,7 @@ function Body(props) {
                         <video 
                             playsInline autoPlay muted 
                             type='video/mp4' width="720" height="560" id="video" 
-                            onPlay={()=>{handlePlay(elVideo,faceDescriptions,metadata.videoWidth,metadata.videoHeight)}} 
+                            onPlay={()=>{handlePlay(faceDescriptions,metadata.videoWidth,metadata.videoHeight)}} 
                             ref={elVideo} onLoadedMetadata={e => {
                                 setMetadata({
                                   videoHeight: e.target.videoHeight,

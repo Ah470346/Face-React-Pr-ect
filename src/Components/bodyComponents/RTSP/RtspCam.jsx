@@ -1,14 +1,18 @@
 import React, {useState  ,useRef} from 'react';
 import { Button ,Spin,notification} from 'antd';
 import {useSelector,useDispatch} from 'react-redux';
-import {fetchFaceDetect} from '../../../Actions/actionCreators';
+import {fetchFaceDetect,addRecognition,changeRecognition,deleteRecognition} from '../../../Actions/actionCreators';
 import {handlePlay} from './Recognition-rtsp';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
 import Play from '../../../assets/play-button.svg';
+import Profile from '../../../assets/bussiness-man.svg';
 
     
 function RtspCam(props) {
     const dispatch = useDispatch();
+    const changeList = (rec) => dispatch(changeRecognition(rec));
+    const addList = (rec) => dispatch(addRecognition(rec));
+    const deleteItem = (label) => dispatch(deleteRecognition(label));
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
 
     const [openCamVideo, setOpenCamVideo] = useState(false);
@@ -16,10 +20,9 @@ function RtspCam(props) {
     const [videoOpacity, setVideoOpacity] = useState("0");
     // const [mediaStream, setMediaStream] = useState("");
     const [Jsmpeg, setJsmpeg] = useState("");
-    const [metadata,setMetadata] = useState("");
     const elVideo = useRef();
     const faceDescriptions = useSelector(state => state.faceDetect);
-
+    const listItem = useSelector(state => state.listRecognition);
     const addCanvasStream = () =>{
         const wrap  = document.getElementById('wrap-canvas');
         const Canvas  = document.createElement('canvas');
@@ -47,6 +50,7 @@ function RtspCam(props) {
             };
     }
     const stop = (video) => {
+        fetchFaceDetects();
         setVideoOpacity("0");
         Jsmpeg.destroy();
         if(video.current !==undefined && video.current !== null){
@@ -73,7 +77,7 @@ function RtspCam(props) {
             <div className='wrap-recognition rtsp'>
                 <div className='wrap-button'>
                     {recognition === false
-                    ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Start Rtsp Camera</Button>)
+                    ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Start RTSP Camera</Button>)
                     : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop Camera</Button>)
                     }   
                 </div>
@@ -85,14 +89,8 @@ function RtspCam(props) {
                             style={{opacity:videoOpacity}}
                             playsInline autoPlay muted 
                             type='video/mp4' width="720" height="560" id="video" 
-                            onPlay={()=>{handlePlay(elVideo,faceDescriptions,metadata.videoWidth,metadata.videoHeight)}} 
-                            ref={elVideo} onLoadedMetadata={e => {
-                                setMetadata({
-                                    videoHeight: e.target.videoHeight,
-                                    videoWidth: e.target.videoWidth,
-                                    duration: e.target.duration
-                                });
-                                }}></video>
+                            onPlay={()=>{handlePlay(faceDescriptions,addList,changeList,deleteItem)}} 
+                            ref={elVideo}></video>
                         {recognition === false && <div className="wrap-play">
                             <img src={Play} alt="" />
                         </div>}
@@ -101,7 +99,21 @@ function RtspCam(props) {
             </div>
             <div className='list-recognition'>
                 <p className='title'>Danh Sách Nhận Diện</p>
-                <div className="list-item"></div>
+                <div className="list-item">
+                    {
+                        listItem.map((i,index)=>{
+                            return(
+                                <div className="item" key={index}>
+                                    <div className="wrap-label">
+                                        <img width="35" height="35" src={Profile} alt="" />
+                                        <p>{i.label}</p>
+                                    </div>
+                                    <p>{i.time}</p>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
             </div>
         </div>
     )

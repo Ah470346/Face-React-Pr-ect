@@ -6,6 +6,9 @@ export const USER_LOGIN = 'USER_LOGIN';
 export const CLEAR_LOGIN = 'CLEAR_LOGIN';
 export const LOAD_FACE_DETECT = "LOAD_FACE_DETECT";
 export const SET_PERMISSION = "SET_PERMISSION";
+export const ADD_RECOGNITION = "ADD_RECOGNITION";
+export const CHANGE_RECOGNITION = "CHANGE_RECOGNITION";
+export const DELETE_RECOGNITION = "DELETE_RECOGNITION";
 
 
 
@@ -13,6 +16,27 @@ export const loadUser = (users) =>{
     return {
         type:LOAD_USER,
         data: users 
+    }
+}
+
+export const deleteRecognition = (mili)=>{
+    return {
+        type:DELETE_RECOGNITION,
+        data: mili 
+    }
+}
+
+export const addRecognition = (rec) => {
+    return {
+        type:ADD_RECOGNITION,
+        data: rec 
+    }
+}
+
+export const changeRecognition = (rec) => {
+    return {
+        type:CHANGE_RECOGNITION,
+        data: rec 
     }
 }
 

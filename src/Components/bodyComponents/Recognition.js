@@ -1,15 +1,13 @@
 import * as faceapi from 'face-api.js';
 
-
 const labeledDescriptors = (descriptions) => {
     return descriptions.map((description)=>{
         let face = new faceapi.LabeledFaceDescriptors(description.label, description.faceDetects);
-        console.log(face);
         return face;
     });
 }
 
-export const handlePlay = (vd,faceDescriptions,width,height) =>{
+export const handlePlay = (faceDescriptions,width,height) =>{
     const video = document.getElementById('video');
     const wrapVideo = document.getElementById('wrap-video');
     const CurrentCanvas = document.getElementsByTagName('canvas');
@@ -19,9 +17,6 @@ export const handlePlay = (vd,faceDescriptions,width,height) =>{
     } else{
         wrapVideo.appendChild(canvas);
     }
-    
-    
-
     let faceMatcher = [];
     if(faceDescriptions.length !== 0){
         faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
