@@ -6,6 +6,7 @@ import {faUser , faLock} from '@fortawesome/free-solid-svg-icons';
 import {userLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
 import authApi from '../../api/authApi';
+import CheckNetwork from "../CheckNetwork";
 function Login(props) {
     const history = useHistory();
     const dispatch = useDispatch();
@@ -57,7 +58,15 @@ function Login(props) {
     
 
     const onFinish = (values) => {
-        postAuth(values);
+        if(CheckNetwork()===false){
+            notification.error({
+                message: 'Yêu cầu kết nối mạng !!!',
+                description:
+                  'Thiết bị của bạn chưa kết nối mạng',
+            });
+        } else{
+            postAuth(values);
+        }
     };
     
     const onFinishFailed = (errorInfo) => {
@@ -112,9 +121,9 @@ function Login(props) {
                                 placeholder='Enter the password'/>
                         </Form.Item>
 
-                        <Form.Item {...tailLayout} name="remember" valuePropName="checked">
+                        {/* <Form.Item {...tailLayout} name="remember" valuePropName="checked">
                             <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
+                        </Form.Item> */}
 
                         <Form.Item className="wrap-button" {...tailLayout}>
                             <Button  danger shape="round" type="primary" htmlType="submit">

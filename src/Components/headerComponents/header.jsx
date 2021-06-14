@@ -12,6 +12,8 @@ import {
 import {useSelector,useDispatch} from 'react-redux';
 import {clearLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
 import {isMobile} from 'react-device-detect';
+import CheckNetwork from "../CheckNetwork";
+import {notification} from 'antd';
 
 function Header(props) {
     const dispatch = useDispatch();
@@ -20,13 +22,21 @@ function Header(props) {
     const setPermis = (user) => dispatch(setPermission(user));
     const status = useSelector(state => state.status);;
     const signOut = ()=>{
-        localStorage.removeItem('username');
-        localStorage.removeItem('password');
-        localStorage.removeItem('remember');
-        localStorage.removeItem('permission');
-        localStorage.setItem('protect', false);
-        setPermis({permission: ""});
-        clearStatus();
+        if(CheckNetwork()===false){
+            notification.error({
+                message: 'Yêu cầu kết nối mạng !!!',
+                description:
+                  'Thiết bị của bạn chưa kết nối mạng',
+            });
+        } else{
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+            localStorage.removeItem('remember');
+            localStorage.removeItem('permission');
+            localStorage.setItem('protect', false);
+            setPermis({permission: ""});
+            clearStatus();
+        }
     } 
     return (
         <div className='wrap-header'>

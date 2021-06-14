@@ -8,6 +8,7 @@ import shortID from 'shortid';
 import recognitionApi from '../../api/recognitionApi';
 import ListRetrain from './listRetrain';
 import * as faceapi from 'face-api.js';
+import CheckNetwork from "../CheckNetwork";
 
 
 function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
@@ -77,150 +78,166 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
     }
     //----------------------------------handler when up load files 
     const handleUpLoad = (event) => {
-        onClick();
-        fetchFaceDetects();
-        setSpin(true);
-        const files = Object.values(event.target.files);
-        if(files.length >= 150){
+        if(CheckNetwork()===false){
             notification.error({
-                message: 'Số lượng file quá lớn !!!',
+                message: 'Yêu cầu kết nối mạng !!!',
                 description:
-                'hãy tách thành các folder có số lượng files không quá 100',
+                  'Thiết bị của bạn chưa kết nối mạng',
             });
-            setDataUpLoad([]);
-            return;
-        }
-        if(Validate(files) === false){
-            notification.error({
-                message: 'File không hợp lệ !!!',
-                description:
-                'File trống hoặc file có kiểu khác image, xin upload lại!',
-            });
-            setDataUpLoad([]);
-            return;
-        }
-        let filterFiles =[];
-        for(let i of files){
-            if(i.type.includes('image')){
-                filterFiles.push(i);
+        } else{
+            onClick();
+            fetchFaceDetects();
+            setSpin(true);
+            const files = Object.values(event.target.files);
+            if(files.length >= 150){
+                notification.error({
+                    message: 'Số lượng file quá lớn !!!',
+                    description:
+                    'hãy tách thành các folder có số lượng files không quá 100',
+                });
+                setDataUpLoad([]);
+                return;
             }
-        }
-        const array = [];
-        const Labels = [];
-        let first , last, dem = 0 , result1, result2 = ""; 
-        for(let i = 0 ; i < filterFiles.length ; i++ ){
-            let str = filterFiles[i].webkitRelativePath;
-            for(let i1 = 0 ; i1 < str.length ; i1++){
-                if(str.charAt(i1)==='/' && dem === 0){
-                    first = i1 +1; 
-                    dem++;
-                } else if(dem >=1 && str.charAt(i1)==='/'){
-                    last = i1;
-                    dem++;
-                } else if (dem > 2){
-                    notification.error({
-                        message: 'Cấp thư mục quá cao !!!',
-                        description:
-                        'Chỉ nhận cấp thư mục không quá 2 (hai thư mục chồng nhau)',
-                    });
-                    setDataUpLoad([]);
-                    return;
+            if(Validate(files) === false){
+                notification.error({
+                    message: 'File không hợp lệ !!!',
+                    description:
+                    'File trống hoặc file có kiểu khác image, xin upload lại!',
+                });
+                setDataUpLoad([]);
+                return;
+            }
+            let filterFiles =[];
+            for(let i of files){
+                if(i.type.includes('image')){
+                    filterFiles.push(i);
                 }
             }
-            if(dem === 1){
-                result1 = str.slice(0,first-1);
-            } else if(dem===2) {
-                result1 = str.slice(first,last);
+            const array = [];
+            const Labels = [];
+            let first , last, dem = 0 , result1, result2 = ""; 
+            for(let i = 0 ; i < filterFiles.length ; i++ ){
+                let str = filterFiles[i].webkitRelativePath;
+                for(let i1 = 0 ; i1 < str.length ; i1++){
+                    if(str.charAt(i1)==='/' && dem === 0){
+                        first = i1 +1; 
+                        dem++;
+                    } else if(dem >=1 && str.charAt(i1)==='/'){
+                        last = i1;
+                        dem++;
+                    } else if (dem > 2){
+                        notification.error({
+                            message: 'Cấp thư mục quá cao !!!',
+                            description:
+                            'Chỉ nhận cấp thư mục không quá 2 (hai thư mục chồng nhau)',
+                        });
+                        setDataUpLoad([]);
+                        return;
+                    }
+                }
+                if(dem === 1){
+                    result1 = str.slice(0,first-1);
+                } else if(dem===2) {
+                    result1 = str.slice(first,last);
+                }
+                dem = 0;
+                if(result1 !== result2){
+                    const arr = filterFiles.filter((file)=>{
+                        //-----------------------------------------Đây là chỗ cho file vào mảng (dễ sai)
+                        return file.webkitRelativePath.includes(`${result1}/`);
+                    })
+                    array.push(arr);
+                    Labels.push(result1);
+                }
+                result2 = result1;
             }
-            dem = 0;
-            if(result1 !== result2){
-                const arr = filterFiles.filter((file)=>{
-                    //-----------------------------------------Đây là chỗ cho file vào mảng (dễ sai)
-                    return file.webkitRelativePath.includes(`${result1}/`);
+            const result = Labels.map((i,index)=>{
+                const a = array[index].map(async (e)=>{
+                    return await getBase64(e);
                 })
-                array.push(arr);
-                Labels.push(result1);
-            }
-            result2 = result1;
-        }
-        const result = Labels.map((i,index)=>{
-            const a = array[index].map(async (e)=>{
-                return await getBase64(e);
+                return {label: i , images: a};
             })
-            return {label: i , images: a};
-        })
-        //-------------------------
-        setSpin(true);
-        setDataUpLoad(result);
-        checkRetrain(result);
-        setTimeout(()=>{
-            setSpin(false);
-            setVisible(true);
-            event.target.value = null;
-        },1500)
+            //-------------------------
+            setSpin(true);
+            setDataUpLoad(result);
+            checkRetrain(result);
+            setTimeout(()=>{
+                setSpin(false);
+                setVisible(true);
+                event.target.value = null;
+            },1500)
+        }
     }
     //----------------------------------call train images when download face-api and set dataDetects
     const handleTrain = (data) =>{
-        if(data.length === 0){
+        if(CheckNetwork()===false){
             notification.error({
-                message: 'Chưa chọn folder training !!!',
+                message: 'Yêu cầu kết nối mạng !!!',
+                description:
+                  'Thiết bị của bạn chưa kết nối mạng',
             });
-        } else {
-        setSpin(true);
-        setTrainLoading("Training....");
-        Promise.all([
-            faceapi.nets.ssdMobilenetv1.load('/models')
-        ]).then( async(res)=>{
-            const result = [];
-            const faceDetectPromise =  await handleTrainImages(data);
-            console.log(faceDetectPromise);
-            for(let i of faceDetectPromise[0]){
-                let a = await i ; 
-                let CheckedFaceDetects = [];// các ảnh đã được lọc , nếu không có khuôn mặt thì bỏ qua
-                for(let i of a.faceDetects){
-                    if(i.length !==0){
-                        CheckedFaceDetects.push(i);
-                    }
-                }
-                result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects});
-            }
-            if(result.length === faceDetectPromise[0].length){
-               //push data to server
-                for(let i = 0 ; i < result.length ; i++){
-                    let array = [];
-                    for(let e of result[i].faceDetects){
-                        array.push(Array.from(e).map(String));
-                    }
-                    await recognitionApi.postRecognition({...result[i],
-                        faceDetects: array})
-                }
-                //set information up load
-                const info = [];
-                for(let i of result){
-                    info.push({name: i.label, images: i.faceDetects.length, total: data.map((j)=>{if(i.label===j.label){return j.images.length}})});
-                } 
-                setInfo(info);
-                //-----------------------------------------------------
-                setSpin(false);
-                notification.success({
-                    message: 'Train Hoàn Tất !!!',
-                    description:
-                        'Quá trình train hoàn tất !',
+        } else{
+            if(data.length === 0){
+                notification.error({
+                    message: 'Chưa chọn folder training !!!',
                 });
-                setTrainLoading('Choose folder to train');
-                setReload(!reload);
-                setReplay(true);
-                fetchFaceDetects();
-                checkRetrain(dataUpLoad);
+            } else {
+            setSpin(true);
+            setTrainLoading("Training....");
+            Promise.all([
+                faceapi.nets.ssdMobilenetv1.load('/models')
+            ]).then( async(res)=>{
+                const result = [];
+                const faceDetectPromise =  await handleTrainImages(data);
+                console.log(faceDetectPromise);
+                for(let i of faceDetectPromise[0]){
+                    let a = await i ; 
+                    let CheckedFaceDetects = [];// các ảnh đã được lọc , nếu không có khuôn mặt thì bỏ qua
+                    for(let i of a.faceDetects){
+                        if(i.length !==0){
+                            CheckedFaceDetects.push(i);
+                        }
+                    }
+                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects});
+                }
+                if(result.length === faceDetectPromise[0].length){
+                //push data to server
+                    for(let i = 0 ; i < result.length ; i++){
+                        let array = [];
+                        for(let e of result[i].faceDetects){
+                            array.push(Array.from(e).map(String));
+                        }
+                        await recognitionApi.postRecognition({...result[i],
+                            faceDetects: array})
+                    }
+                    //set information up load
+                    const info = [];
+                    for(let i of result){
+                        info.push({name: i.label, images: i.faceDetects.length, total: data.map((j)=>{if(i.label===j.label){return j.images.length}})});
+                    } 
+                    setInfo(info);
+                    //-----------------------------------------------------
+                    setSpin(false);
+                    notification.success({
+                        message: 'Train Hoàn Tất !!!',
+                        description:
+                            'Quá trình train hoàn tất !',
+                    });
+                    setTrainLoading('Choose folder to train');
+                    setReload(!reload);
+                    setReplay(true);
+                    fetchFaceDetects();
+                    checkRetrain(dataUpLoad);
+                }
+            })
             }
-        })
         }
     }
     return (
         <>
-            <ListRetrain 
+            {dataNew.length === 1 && dataExist.length === 0 ? <></>:<ListRetrain 
                 dataExist={dataExist} handleTrain={handleTrain}  
-                dataNew={dataNew} setVisible={setVisible} visible={visible} ></ListRetrain>
+                dataNew={dataNew} setVisible={setVisible} visible={visible} ></ListRetrain>}
             <div className='wrap-input'>
                 <Spin spinning={spin}>
                     <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>

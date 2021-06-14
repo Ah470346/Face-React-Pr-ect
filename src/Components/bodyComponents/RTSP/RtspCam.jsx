@@ -6,6 +6,7 @@ import {handlePlay} from './Recognition-rtsp';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
 import Play from '../../../assets/play-button.svg';
 import Profile from '../../../assets/bussiness-man.svg';
+import CheckNetwork from '../.././CheckNetwork';
 
     
 function RtspCam(props) {
@@ -36,19 +37,28 @@ function RtspCam(props) {
     }
 
     const streamCamVideo = (video) => {
-        setOpenCamVideo(true);
-        setRecognition(true);
-        fetchFaceDetects();
-        setTimeout( async()=>{
-            setVideoOpacity("1");
-            setOpenCamVideo(false);
-        },2000);
-        const mediaStream = addCanvasStream(); 
-            video.current.srcObject = mediaStream;
-            video.current.onloadedmetadata = function(e) {
-                video.current.play();
-            };
+        if(CheckNetwork()===false){
+            notification.error({
+                message: 'Yêu cầu kết nối mạng !!!',
+                description:
+                  'Thiết bị của bạn chưa kết nối mạng',
+            });
+        } else{
+            setOpenCamVideo(true);
+            setRecognition(true);
+            fetchFaceDetects();
+            setTimeout( async()=>{
+                setVideoOpacity("1");
+                setOpenCamVideo(false);
+            },2000);
+            const mediaStream = addCanvasStream(); 
+                video.current.srcObject = mediaStream;
+                video.current.onloadedmetadata = function(e) {
+                    video.current.play();
+                };
+        }
     }
+       
     const stop = (video) => {
         fetchFaceDetects();
         setVideoOpacity("0");

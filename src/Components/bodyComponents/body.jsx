@@ -8,6 +8,7 @@ import InputFile from './InputFile';
 import TrainStatus from './trainStatus';
 import ListTrain from './listTrain';
 import {handlePlay} from './Recognition';
+import CheckNetwork from "../CheckNetwork";
 
 const { Canvas, Image, ImageData } = canvas
 faceapi.env.monkeyPatch ({
@@ -35,6 +36,7 @@ function Body(props) {
     const faceDescriptions = useSelector(state => state.faceDetect);
     const permission = useSelector(state => state.permission);
 
+
     // replay canvas when update train
     if(faceDescriptions!== undefined && faceDescriptions.length!==0 && replay ===true){
         const CurrentVideo = document.getElementsByTagName('video');
@@ -45,35 +47,43 @@ function Body(props) {
     }
 
     const streamCamVideo = (video) => {
-        fetchFaceDetects();
-        const constraints = {audio : false,video : true};
-        navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then(function(mediaStream) {
-            setOpenCamVideo(true);
-            setRecognition(true);
-            video.current.srcObject = mediaStream;
-            video.current.onloadedmetadata = function(e) {
-                video.current.play();
-            };
-          })
-          .catch(function(err) {
-            console.log(err.name + ": " + err.message);
-            if(err.name === "NotFoundError"){
-                notification.error({
-                    message: 'Không tìm thấy thiết bị !!!',
-                    description:
-                      'Máy tính của bạn có thể không hỗ trợ webCam, chúng tôi không tìm thấy thiết bị',
-                });
-            } else if(err.name === "NotAllowedError"){
-                notification.error({
-                    message: 'Không được cấp phép truy cập !!!',
-                    description:
-                      'Hãy cấp phép cho website truy cập vào thiết bị của bạn!',
-                });
-            }
-            
-          }); // always check for errors at the end.
+        if(CheckNetwork()===false){
+            notification.error({
+                message: 'Yêu cầu kết nối mạng !!!',
+                description:
+                  'Thiết bị của bạn chưa kết nối mạng',
+            });
+        } else{
+            fetchFaceDetects();
+            const constraints = {audio : false,video : true};
+            navigator.mediaDevices
+            .getUserMedia(constraints)
+            .then(function(mediaStream) {
+                setOpenCamVideo(true);
+                setRecognition(true);
+                video.current.srcObject = mediaStream;
+                video.current.onloadedmetadata = function(e) {
+                    video.current.play();
+                };
+            })
+            .catch(function(err) {
+                console.log(err.name + ": " + err.message);
+                if(err.name === "NotFoundError"){
+                    notification.error({
+                        message: 'Không tìm thấy thiết bị !!!',
+                        description:
+                        'Máy tính của bạn có thể không hỗ trợ webCam, chúng tôi không tìm thấy thiết bị',
+                    });
+                } else if(err.name === "NotAllowedError"){
+                    notification.error({
+                        message: 'Không được cấp phép truy cập !!!',
+                        description:
+                        'Hãy cấp phép cho website truy cập vào thiết bị của bạn!',
+                    });
+                }
+                
+            }); // always check for errors at the end.
+        }
     }
     const stop = (video) => {
         if(video.current !==undefined && video.current !== null){
@@ -119,7 +129,7 @@ function Body(props) {
                     }   
                 </div>
                 <div id="wrap-video" className='wrap-video' >
-                    { openCamVideo === true ? (
+                    { openCamVideo === true&& (
                     <>
                         <video 
                             playsInline autoPlay muted 
@@ -134,14 +144,15 @@ function Body(props) {
                               }}></video>
                     </>
                     )
-                    :
+                    
                     (<div className='signal'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" className="bi bi-play-circle" viewBox="0 0 16 16">
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                             <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
                         </svg>
                         <p>No Signal</p>
-                    </div>)}
+                    </div>)
+                    }
                 </div>
             </div>
             {showModal === true && <TrainStatus info={info} setInfo={setInfo} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
