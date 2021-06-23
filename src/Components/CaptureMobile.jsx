@@ -1,9 +1,11 @@
 import React,{useState,useRef} from 'react';
-import { Button ,notification,Spin} from 'antd';
+import { Button ,notification,Spin,Select} from 'antd';
 import {useSelector, useDispatch} from 'react-redux';
 import * as faceapi from 'face-api.js';
 import {fetchFaceDetect} from '../Actions/actionCreators';
-import CheckNetwork from "./CheckNetwork"; 
+import CheckNetwork from "./CheckNetwork";
+
+const { Option } = Select;
 
 function CaptureMobile(props) {
     const [openCam,setOpenCam] = useState("1");
@@ -11,14 +13,24 @@ function CaptureMobile(props) {
     const [spin,setSpin] = useState(false);
     const [metadata, setMetadata] = useState(null);
     const [size, setSize] = useState(null);
+    const [faceDetectSelect, setFaceDetectSelect] = useState([]);
     const dispatch = useDispatch();
     const fetchFaceDetects = ()=> dispatch(fetchFaceDetect);
     const faceDescriptions = useSelector(state => state.faceDetect);
+    const channels = useSelector(state => state.channel);
 
     let canvas , ctx,video ,photo;
     video = document.getElementById("video");
     canvas = document.getElementById("canvas");
     photo = document.getElementById("image");
+
+    const handleChange = (value) =>{
+        const arr = faceDescriptions.filter((i)=>{
+            console.log(i.ChannelName,value);
+            return i.ChannelName === value;
+        })
+        setFaceDetectSelect(arr);
+    }
 
     const offCam = (video)=>{
         const stream = video.current.srcObject;
@@ -52,6 +64,10 @@ function CaptureMobile(props) {
                 message: 'Yêu cầu kết nối mạng !!!',
                 description:
                   'Thiết bị của bạn chưa kết nối mạng',
+            });
+        } else if(faceDetectSelect.length === 0){
+            notification.error({
+                message: 'Bạn chưa chọn channel hoặc channel không có dữ liệu !!!',
             });
         } else{
             fetchFaceDetects();
@@ -158,31 +174,31 @@ function CaptureMobile(props) {
             }
         }
       }
-    const stop = (video) => {
-        if(CheckNetwork()===false){
-            notification.error({
-                message: 'Yêu cầu kết nối mạng !!!',
-                description:
-                  'Thiết bị của bạn chưa kết nối mạng',
-            });
-        } else{
-            fetchFaceDetects();
-            const stream = video.current.srcObject;
-            var context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            var data = canvas.toDataURL('image/png');
-            photo.setAttribute('src', data);
-            if (stream !== null){
-                const tracks = stream.getTracks();
-                tracks.forEach(function(track) {
-                    track.stop();
-                });
+    // const stop = (video) => {
+    //     if(CheckNetwork()===false){
+    //         notification.error({
+    //             message: 'Yêu cầu kết nối mạng !!!',
+    //             description:
+    //               'Thiết bị của bạn chưa kết nối mạng',
+    //         });
+    //     } else{
+    //         fetchFaceDetects();
+    //         const stream = video.current.srcObject;
+    //         var context = canvas.getContext('2d');
+    //         context.clearRect(0, 0, canvas.width, canvas.height);
+    //         var data = canvas.toDataURL('image/png');
+    //         photo.setAttribute('src', data);
+    //         if (stream !== null){
+    //             const tracks = stream.getTracks();
+    //             tracks.forEach(function(track) {
+    //                 track.stop();
+    //             });
         
-                video.current.srcObject = null;
-            }
-            setOpenCam("1");
-        }
-    }
+    //             video.current.srcObject = null;
+    //         }
+    //         setOpenCam("1");
+    //     }
+    // }
     //--------------------------------------------return detect
     const labeledDescriptors = (descriptions) => {
         return descriptions.map((description)=>{
@@ -252,15 +268,22 @@ function CaptureMobile(props) {
                 <img id="image"/>
             </div>
             <div className="wrap-button">  
-               {openCam === "1" && <Button onClick={()=>streamCamVideo(elVideo)} type="primary">Mở Camera</Button>}
-               {openCam === "2" && <Button onClick={()=>snapshot(elVideo)} type="primary">Chụp Ảnh</Button>}
+                <Select onChange={handleChange} defaultValue="choose channel">
+                    {
+                        channels.map((i,index)=>{
+                            return(<Option value={i.ChannelName} key={index}>{i.ChannelName}</Option>)
+                        })
+                    }
+                </Select>
+               {openCam === "1" && <Button onClick={()=>streamCamVideo(elVideo)} type="primary">Test</Button>}
+               {openCam === "2" && <Button onClick={()=>snapshot(elVideo)} type="primary">Capture</Button>}
                {openCam === "3" &&
                 <Spin spinning={spin}> 
                     <Button className="button-recognition" 
                             onClick={()=>handleImage(size.width,size.height,faceDescriptions,photo)} 
-                            type="primary">Nhận Diện</Button>
+                            type="primary">Recognition</Button>
                 </Spin>}
-               <Button onClick={()=>stop(elVideo)} danger type="primary">Stop Cam</Button>
+               {/* <Button onClick={()=>stop(elVideo)} danger type="primary">Stop Cam</Button> */}
                <Button onClick={()=>clearPhoto()} type="primary">Clear</Button>
             </div>
             

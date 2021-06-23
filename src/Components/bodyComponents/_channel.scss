@@ -1,0 +1,65 @@
+
+.wrap-channel {
+    background-color: #f9f9f9;
+    height: 100%;
+    width: 80%;
+
+    & > p {
+        height: 5%;
+        padding-left: 40px;
+        padding-top: 10px;
+        font-size: 1.3em;
+    }
+
+    & .wrap-list {
+        width: 100%;
+        height: 95%;
+        padding: 10px 30px 20px 30px;
+        overflow-y: auto;
+        
+
+        & .list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            padding-top: 10px;
+            @include flexBox(row,flex-start,center);
+            flex-wrap: wrap;
+
+            & li {
+                padding: 15px 40px;
+                width: 25%;
+                height: 180px;
+                & .add-channel-item{
+                    cursor: pointer;
+                    width: 100%;
+                    height: 100%;
+                    border: 1px dashed rgba($color: #000000, $alpha: 0.5);
+                    border-width: 2px;
+                    @include flexBox(row,center,center);
+
+                    p {
+                        margin-left: 20px;
+                        font-size: 1.5em;
+                        font-weight: 550;
+                    }
+                }
+    
+                & .channel-item {
+                    cursor: pointer;
+                    width: 100%;
+                    height: 100%;
+                    border: 1px solid rgba($color: #000000, $alpha: 0.5);
+                    @include flexBox(row,center,center);
+
+                    p {
+                        font-size: 1.5em;
+                        font-weight: 550;
+                    }
+                }
+            }
+
+            
+        }
+    }
+}

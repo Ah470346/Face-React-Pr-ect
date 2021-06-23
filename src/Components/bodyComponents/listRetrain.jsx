@@ -1,94 +1,85 @@
 import React, {useState,useEffect} from 'react';
-import Folder from '../../assets/folder.svg';
-import {Modal, Checkbox } from 'antd';
-import Remove from '../../assets/delete.svg';
+import { Checkbox } from 'antd';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faUser} from '@fortawesome/free-solid-svg-icons';
 
 
-const ListRetrain = ({visible,setVisible,handleTrain,dataExist,dataNew}) => {
+
+const ListRetrain = ({visible,dataExist,dataNew,setDataTrain,dataTrain}) => {
     const [listCheck , setListCheck] = useState([]);
-    const [listNew , setListNew] = useState([]);
-    const [listExist , setListExist] = useState([]);
     //----------------------------------------Checkbox
     const onChange = (e,index) => {
+        let arr = [...dataExist,...dataNew];
         let list = [...listCheck];
-        for(let i of list){
-            if(i.index === index){
-                i.checked = e.target.checked;
+        for(let i = 0 ; i < list .length ; i++){
+            if(list[i].label === index){
+                list[i].checked = e.target.checked;
+                if(e.target.checked == false){
+                    const data = dataTrain.filter((i)=>{
+                        return index !== i.label;
+                    })
+                    setDataTrain(data);
+                } else {
+                    const data = arr.filter((i)=>{
+                        return index === i.label;
+                    })
+                    setDataTrain([...dataTrain,...data]);
+                }
+                
             }
         }
         setListCheck(list);
       };
-    const onDelete = (id) =>{
-        const data = listNew.filter((i,index)=>{
-            return index !== id;
-        })
-        setListNew(data);
-    }
-    const onOKe = () =>{
-        const data = dataExist.filter((i,index)=>{
-            return listCheck[index].checked !== false
-        });
-          ;
-        setListExist([]);
-        handleTrain([...data,...listNew]);
-        setVisible(false);
-    }
     useEffect(()=>{
-        const listCheckDefault =  dataExist.map((i,index)=>{
-            return {index: index , checked: false};
-        });
-        setListCheck(listCheckDefault);
-        setListExist([...dataExist]);
-        setListNew([...dataNew]);
-    },[visible]);
+        let list = [...dataExist,...dataNew];
+        const filter = list.map((i)=>{
+            return {label:i.label, checked: true};
+        })
+        setListCheck(filter);
+    },[dataExist,dataNew]);
     return (
     <>
-        {visible === true && <Modal
-            title="Danh sách các folders đã tải lên, chọn những folders muốn training"
-            centered
-            visible={visible}
-            onOk={onOKe}
-            onCancel={() => {setVisible(false)}}
-            okText="Train"
-            cancelText="Cancel"
+        {visible === true && <div
             className='retrain-status'
-            width={650}
             >
-            {listExist.length !== 0 && <><p className="list-title old">Các folders đã tồn tại, chọn những folder muốn train lại:</p>
-            <div className='scroll-list exist'>
+            <p className="list-title">List User</p>
+            <div className='scroll-list'>
                 {
-                    listExist.map((i,index)=>{
+                    dataExist.length !== 0 && dataExist.map((i,index)=>{
                         return( <div key={index} className="list-item-exist">
                             <div className="wrap-folder">
-                                    <img src={Folder} alt=""></img>
+                                    <FontAwesomeIcon className="icon" icon={faUser}></FontAwesomeIcon>
                                     <p>{i.label}</p>
+                            </div>
+                            <div className="status exist">
+                                <p>Exist</p>
                             </div>
                             <div className='choose-folder'>
-                                <Checkbox defaultChecked={false}  className='a' onChange={(e)=>onChange(e,index)}></Checkbox>
+                                <Checkbox defaultChecked={true}  className='a' onChange={(e)=>onChange(e,i.label)}></Checkbox>
                             </div>
                         </div>
                         )
                     })
                 }
-            </div></>}
-            { listNew.length !==0 && <><p className="list-title new">Các folders mới, chọn những folder muốn train:</p>
-                <div className='scroll-list new'>
                 {
-                    listNew.map((i,index)=>{
+                    dataNew.length !==0 && dataNew.map((i,index)=>{
                         return( <div key={index} className="list-item-exist">
                             <div className="wrap-folder">
-                                    <img src={Folder} alt=""></img>
+                                    <FontAwesomeIcon className="icon" icon={faUser}></FontAwesomeIcon>
                                     <p>{i.label}</p>
                             </div>
-                            <div className='delete-folder'>
-                                <img onClick={()=>onDelete(index)} src={Remove} alt=""></img>
+                            <div className="status new">
+                                <p>New</p>
+                            </div>
+                            <div className='choose-folder'>
+                                <Checkbox defaultChecked={true}  className='a' onChange={(e)=>onChange(e,i.label)}></Checkbox>
                             </div>
                         </div>
                         )
                     })
                 }
-            </div></>}
-        </Modal>}
+            </div>
+        </div>}
     </>
     );
 };

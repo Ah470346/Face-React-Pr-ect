@@ -2,9 +2,20 @@ import * as faceapi from 'face-api.js';
 
 
 //----------------------------------handler train images 
-export const handleTrainImages = (dataUpLoad) =>{
+export const handleTrainImages = (data,setProgress,setPercent) =>{
+    const total = data.reduce((d,i)=>{
+        return d + i.images.length
+    },0);
+    let percent = 1;
+    const number = (num)=>{
+        if(num === 100){
+            return 99;
+        } else{
+            return num;
+        }
+    }
     return Promise.all([
-        dataUpLoad.map(async label =>{
+        data.map(async label =>{
             const descriptions = [];
             for(let i of label.images){
                 const img = await i;
@@ -28,10 +39,12 @@ export const handleTrainImages = (dataUpLoad) =>{
                     if(finalDetection.descriptor){
                         descriptions.push(finalDetection.descriptor);
                     }
+                    setPercent({number:number(Math.round(percent/total*100))});
+                    percent ++;
                 } 
                
             }
-            return {label: label.label , faceDetects: descriptions};
+            return {label: label.label , faceDetects: descriptions,ChannelName:label.channel};
         })
     ]);
 } 

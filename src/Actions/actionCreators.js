@@ -1,5 +1,6 @@
 import usersApi from '../api/usersApi'; 
 import recognitionApi from '../api/recognitionApi';
+import channelApi from '../api/channelsApi';
 
 export const LOAD_USER = 'LOAD_USER';
 export const USER_LOGIN = 'USER_LOGIN';
@@ -9,6 +10,8 @@ export const SET_PERMISSION = "SET_PERMISSION";
 export const ADD_RECOGNITION = "ADD_RECOGNITION";
 export const CHANGE_RECOGNITION = "CHANGE_RECOGNITION";
 export const DELETE_RECOGNITION = "DELETE_RECOGNITION";
+export const LOAD_CHANNEL = "LOAD_CHANNEL";
+export const POST_CHANNEL = "POST_CHANNEL";
 
 
 
@@ -18,6 +21,22 @@ export const loadUser = (users) =>{
         data: users 
     }
 }
+
+
+export const postChannel = (channel) =>{
+    return {
+        type:POST_CHANNEL,
+        data: channel 
+    }
+}
+
+export const loadChannel = (channels) =>{
+    return {
+        type:LOAD_CHANNEL,
+        data: channels 
+    }
+}
+
 
 export const deleteRecognition = (mili)=>{
     return {
@@ -65,6 +84,16 @@ export const fetchUser = () => async (dispatch) => {
     try {
         const response = await usersApi.getAll();
         dispatch(loadUser(response));
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
+export const fetchChannel = () => async (dispatch) => {
+    try {
+        const response = await channelApi.getAll();
+        dispatch(loadChannel(response));
     } catch (error) {
         console.log(error);
     }

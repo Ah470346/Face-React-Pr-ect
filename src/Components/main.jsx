@@ -13,10 +13,11 @@ import {isMobile} from 'react-device-detect';
 import CaptureMobile from './CaptureMobile';
 import CaptureDesktop from './CaptureDesktop';
 
-function Main({fetchUser,status,fetchFaceDetect,permission}) {
+function Main({fetchUser,status,fetchFaceDetect,permission,fetchChannel}) {
     useEffect(()=>{
         fetchUser();
         fetchFaceDetect();
+        fetchChannel();
         const fetchModels = async () =>{
           await faceapi.nets.faceLandmark68Net.load('/models');
           await faceapi.nets.ssdMobilenetv1.load('/models');
@@ -27,24 +28,34 @@ function Main({fetchUser,status,fetchFaceDetect,permission}) {
     },[fetchUser]);
     return (
         <div className='main'>
-            <Header></Header>
             {
               isMobile === false ?
                 <Switch>
                 <Route exact path="/">
-                  <CaptureDesktop></CaptureDesktop>
+                    <Header></Header>
+                    <CaptureDesktop></CaptureDesktop>
                 </Route>
                 <ProtectLoginRoute exact path="/login" protect={status.protect}>
                     <Login/>
                 </ProtectLoginRoute>
                 <ProtectHomeRoute exact path="/home" permission={permission.permission}>
+                    <Header></Header>
                     <Body/>
                 </ProtectHomeRoute>
-                <ProtectHomeRoute exact path="/rtsp" permission={permission.permission}>
+                <ProtectRTSPRoute exact path="/rtsp" permission={permission.permission}>
+                    <Header></Header>
                     <Rtsp/>
-                </ProtectHomeRoute>
+                </ProtectRTSPRoute>
               </Switch>
-              : <CaptureMobile></CaptureMobile>
+              :
+              <Switch>
+                <Route exact path="/">
+                  <CaptureMobile></CaptureMobile>
+                </Route>
+                <Route exact path="/login">
+                  <Login></Login>
+                </Route>
+              </Switch>
             }
         </div>
     )
@@ -69,7 +80,21 @@ const ProtectHomeRoute = ({permission,children,...rest})=>{
   return (
     <Route
       {...rest}
-      render = {()=> permission === "admin" || permission ==="user" ? (
+      render = {()=> permission === "admin"? (
+        children
+      ):
+        (
+          <Redirect to='/login'></Redirect>
+        )
+      }
+    />
+  )
+}
+const ProtectRTSPRoute = ({permission,children,...rest})=>{
+  return (
+    <Route
+      {...rest}
+      render = {()=> permission === "user"? (
         children
       ):
         (

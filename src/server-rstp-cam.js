@@ -1,14 +1,29 @@
-Stream = require('node-rtsp-stream');
-stream = new Stream({
+const Stream = require('node-rtsp-stream');
+const fs = require('fs');
+const spawn = require('child_process').spawn;
+
+// rtsp://admin:abcd1234@192.168.0.94:554
+// module.exports.Run = (port,url)=>{
+//   const stream = new Stream({
+//     name: 'name',
+//     streamUrl: url,
+//     wsPort: port,
+//     ffmpegOptions: { // options ffmpeg flags
+//       '-stats': '', // an option with no neccessary value uses a blank string
+//       '-r': 30 // options with required values specify the value after the key
+//     }
+//   })
+// }
+
+const stream = new Stream({
   name: 'name',
-  streamUrl: `rtsp://admin:abcd1234@192.168.0.22:554`,
+  streamUrl: "rtsp://admin:abcd1234@192.168.0.22:554",
   wsPort: 9999,
   ffmpegOptions: { // options ffmpeg flags
     '-stats': '', // an option with no neccessary value uses a blank string
     '-r': 30 // options with required values specify the value after the key
   }
-})
-
+});
 // const onvif = require('node-onvif');
 
 // let device = new onvif.OnvifDevice({

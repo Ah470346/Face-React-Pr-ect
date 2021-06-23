@@ -1,8 +1,28 @@
 
 .wrap-body {
-    height: 93.5%;
+    height: 91%;
+    width: 100%;
     position: relative;
-    @include flexBox(row,center);
+    
+
+    & .body-spin {
+        width: 100%;
+        height: 100%;
+        
+
+        .ant-spin-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+        }
+        .ant-spin-spinning {
+            max-height: 100%;
+        }
+        .ant-spin-blur {
+            opacity: 0.01;
+        }
+    }
 
     & p{
         margin: 0;
@@ -10,115 +30,73 @@
         color: rgb(141, 137, 137);
     }
     & .side-bar{
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 19%;
-        margin-top: 10px;
-        height: 665px;
-        box-shadow: 1px 0px 2px rgba($color: #000000, $alpha: 0.1);
-        border-radius: 0px 3px 0 0;
-        background-color: rgb(221, 246, 248);
-        
+        width: 20%;
+        height:100%;
+        padding-left: 30px;
+        & > div {
+            @include flexBox(row,flex-start,center);
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
 
-        & .wrap-list-train {
-            width: 100%;
-            height: 100%;
-            padding-top: 40px;
-            padding-left: 20px;
-    
-            & .list-train{
-                width: 100%;
-                height: 100%;
-                padding-top: 10px;
-                font-family: $fontFamily;;
-                // @include flexBox(column,center,center);
-    
-                & .search-folder {
-                    width: 90%;
-                    margin-bottom: 20px;
-                    .anticon-search {
-                        margin-bottom: 5px;
-                        font-size: large;
-                    }
-                    
-                }
-    
-                & > p {
-                    color: #000;
-                    display: inline-block;
-                    padding-bottom: 10px;
-                    font-size: 1.2em;
-                    // border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
-                }
-    
-                & .scroll-list {
-                    width: 100%;
-                    @include calc(height, '100% - 120px');
-                    overflow-y:hidden;
-    
-                    & .list-item {
-                        @include flexBox(row,flex-start, center);
-                        padding: 5px 10px;
-                        cursor: pointer;
-                        img{
-                            margin-right: 10px;
-                        }
-                        p {
-                            color: #1a1a1a;
-                            font-size: 1.1em;
-                        }
-                    }
-                }
-    
-                & .scroll-list:hover {
-                    overflow-y:auto;
-                }
+            img {
+                margin-right: 30px;
             }
-    
+            p {
+                font-size: 1.4em;
+            }
+            
         }
+        
     }
-    & .wrap-recognition {
-        padding-top: 40px;
-        height: 685px;
-        padding-bottom: 10px;
-        width: 60%;
+    & .wrap-content {
+        background-color: #f9f9f9;
+        height: 100%;
+        width: 80%;
 
-
-        & .list-item-exist{
-            @include flexBox(row,space-between,center)
+        & > p {
+            height: 5%;
+            padding-left: 30px;
+            padding-top: 10px;
+            font-size: 1.3em;
         }
         & .wrap-button {
-            @include flexBox(row,space-around,center);
-            padding: 0 50px 0 50px;
-            & .wrap-input {
-                position: relative;
-                @include flexBox(column,center,center);
+            height: 10%;
+            width: 100%;
+            padding: 20px 70px 0px 30px;
+            @include flexBox(row,space-between,center);
 
-                & label {
-                    width: 220px;
-                    height: 45px;
-                    text-align: center;
-                    line-height: 2.5;
-                    background-color: $colorPrimary;
-                    color: white;
-                    border-radius: 3px;
-                    font-size: 1.1em;
-                    transition: all 0.3s;
-                    
+            & .search-folder {
+                height: 50px;
+                width: 280px;
+
+                & .ant-input-prefix{
+                    color: rgb(199, 195, 204);
+                    margin-right: 10px;
+                    svg{
+                        width: 20px;
+                        height: 20px;
+                    }
                 }
-                & label:hover {
-                    opacity: 0.7;
-                }
-                
                 & input {
-                    display: none;
+                    font-size: 1.3em;
                 }
+            }
+            & .add-user {
+                position: relative;
+                background-color: rgb(19, 19, 134);
+                color: white;
+                width: 150px;
+                height: 50px;
 
-                & p {
+                .icon {
                     position: absolute;
-                    bottom: -60%;
+                    left: 10px;
+                    top: 16px
                 }
+            }
+            & .add-user:hover{
+                background-color: rgb(77, 77, 187) !important;
             }
             & button {
                 width: 220px;
@@ -126,138 +104,59 @@
                 font-size: 1.1em;
             }
         }
-
-        & .wrap-video {
-            position: relative;
-            margin: 20px 20px 0px 20px;
-            padding: 5px 5px 5px 5px;
-            height: 570px;
-            border: 1px solid rgba($color: #000000, $alpha: 0.1);
-            @include flexBox(row,center,center);
-
-            canvas {
-                position: absolute;
-                left: 5px;
-                top: 5px;
-                width: 98.5%;
-                height: 98.5%;
-            }
-            video {
+        & .wrap-list-train {
+            width: 100%;
+            height: 82%;
+            padding: 20px 20px 0px 30px;
+    
+            & .list-train{
                 width: 100%;
                 height: 100%;
-                transition: all ease-in 0.5s;
-            }
-            & .signal{
-                width: 150px;
-                height: 150px;
-                @include flexBox(column,center,center);
-                & svg {
-                    fill: rgb(199, 10, 199);
-                }
-
-                & p {
-                    margin-top: 5px;
-                }
-            }
-            //------------------------------------RTSPCam Stream
-            & .wrap-canvas{
-                position: absolute;
-                left: 5px;
-                top: 5px;
-                width: 98.5%;
-                height: 98.5%;
-                
-                & canvas {
-                    position: relative;
+                font-family: $fontFamily;;
+                // @include flexBox(column,center,center);
+    
+                & .scroll-list {
                     width: 100%;
                     height: 100%;
-                    left: 0;
-                    top: 0;
-                    opacity: 0;
+                    padding-right: 30px;
+                    overflow-y:scroll;
+    
+                    & .list-item {
+                        margin-top: 20px;
+                        @include flexBox(row,flex-start, center);
+                        padding: 20px 20px;
+                        border-radius: 10px;
+                        border: 1px solid rgba($color: #000000, $alpha: 0.2);
+                        cursor: pointer;
+                        .icon{
+                            margin-right: 40px;
+                            width: 30px;
+                            height: 30px;
+                        }
+                        p {
+                            color: #1a1a1a;
+                            font-size: 1.4em;
+                            font-weight: 600;
+                        }
+                    }
+
+                    & .list-item:first-child {
+                        margin-top: 0;
+                    }
                 }
             }
-            & .wrap-play {
-                position: absolute;
-                @include absoluteCenter(both);
-            }
-
-            & .ant-spin-nested-loading{
-                width: 100%;
-                height: 100%;
-
-                & .ant-spin-container {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-
+    
         }
+
     }
     .train-status {
         overflow-y: auto;
         & .wrap-item {
             @include flexBox(row,space-between,center);
         }
-    }
-}
-& .wrap-body.rtsp {
-    @include flexBox(row,space-evenly);
-    font-family: $fontFamily;
-    
-    & .list-recognition {
-        margin-top: 10px;
-        width: 340px;
-        height: 665px;
-        border: 1px solid rgba($color: #000000, $alpha: 0.2);
-        border-radius: 5px;
-        @include flexBox(column,flex-start,center);
-        padding-top: 10px;
-
-        & .title {
-            margin: 0;
-            font-weight: 600;
-            font-family: $fontFamily;
-            font-size: 1.1em;
-            color: rgb(66, 65, 65);
-        }
-
-        & .list-item {
-            width: 100%;
-            margin-top: 10px;
-            padding: 0 5px;
-            overflow-y: hidden;
-
-            & .item {
-                width: 100%;
-                padding: 10px;
-                margin-top: 5px;
-                height: 50px;
-                @include flexBox(row,flex-start,center);
-                border-radius: 5px;
-                border: 1px solid rgba($color: #000000, $alpha: 0.2);
-
-                & .wrap-label {
-                    @include flexBox(row,flex-start,center);
-                    p {
-                        margin-left: 5px;
-                        font-size: 1.6em;
-                        color: rgb(240, 9, 59);
-                        margin-top: 7px;
-                        font-weight: 600;
-                    }
-                }
-                & > p {
-                    margin-left: 10px;
-                    font-size: 1em;
-                    margin-top: 13px;
-                }
-            }
-            & .item:last-child {
-                margin-bottom: 10px;
-            }
-        }
-        & .list-item:hover {
-            overflow-y: auto;
+        & .list-item-exist{
+            @include flexBox(row,space-between,center)
         }
     }
 }
+@import '../bodyComponents/RTSP/rtspCam';

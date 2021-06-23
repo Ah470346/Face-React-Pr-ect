@@ -1,0 +1,175 @@
+& .wrap-body.rtsp {
+    @include flexBox(row,space-evenly);
+    font-family: $fontFamily;
+
+    & .wrap-recognition {
+        margin-top: 10px;
+        height: 665px;
+        width: 60%;
+    }
+
+    & .wrap-video{
+        height: 100%;
+        width: 100%;
+        position: relative;
+        padding: 5px 5px 5px 5px;
+        border-radius: 30px;
+        box-shadow: 0px 0px 10px rgba($color: #000000, $alpha: 0.2);
+        @include flexBox(row,center,center);
+        canvas {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            width: 98.5%;
+            height: 98.5%;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            transition: all ease-in 0.5s;
+        }
+        & .signal{
+            width: 150px;
+            height: 150px;
+            @include flexBox(column,center,center);
+            & svg {
+                fill: rgb(199, 10, 199);
+            }
+
+            & p {
+                margin-top: 5px;
+            }
+        }
+        //------------------------------------RTSPCam Stream
+        & .wrap-canvas{
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            width: 98.5%;
+            height: 98.5%;
+            
+            & canvas {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+                opacity: 0;
+            }
+        }
+        & .wrap-play {
+            position: absolute;
+            @include absoluteCenter(both);
+        }
+    }
+
+    & .wrap-video .socket{
+        padding: 15px;
+        width: 100%;
+        height: 100%;
+    }
+    
+    & .list-recognition {
+        margin-top: 10px;
+        padding-bottom: 20px;
+        width: 400px;
+        height: 665px;
+        box-shadow: 0px 0px 10px rgba($color: #000000, $alpha: 0.2);
+        border-radius: 30px;
+        @include flexBox(column,flex-start);
+        padding-top: 10px;
+
+        .ant-select {
+            margin-top: 20px;
+            width: 350px;
+            height: 50px;
+            font-size: 1.3em;
+            margin-left: 50%;
+            transform: translateX(-50%);
+            
+            .ant-select-selector {
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
+    
+                .ant-select-selection-search {
+                    height: 100%;
+                    .ant-select-selection-search-input {
+                        height: 100%;
+                    }
+                }
+                .ant-select-selection-item {
+                    margin-top: 9px;
+                    
+                }
+            }
+        }
+        .option {
+            font-size: 1.3em;
+        }
+        
+        & .title {
+            margin: 0;
+            margin-left: 25px;
+            margin-top: 30px;
+            font-weight: 600;
+            font-family: $fontFamily;
+            font-size: 1.1em;
+            color: rgb(66, 65, 65);
+        }
+
+        & .list-item {
+            width: 100%;
+            margin-top: 20px 10px;
+            padding: 0 5px;
+            overflow-y: hidden;
+            @include flexBox(column,flex-start,center);
+
+            & .item {
+                width: 90%;
+                padding: 10px 0px;
+                margin: 5px 0 0 0;
+                height: 70px;
+                @include flexBox(row,flex-start,center);
+                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);
+
+                & .wrap-label {
+                    @include flexBox(row,flex-start,center);
+                }
+                & .wrap-p{
+                    margin-left: 35px;
+                    p {
+                        margin: 0;
+                        font-size: 1.6em;
+                        color: rgb(24, 9, 240);
+                        font-weight: 600;
+                    }
+
+                    p:last-child{
+                        color: $colorTextBlur;
+                        font-size: 1em;
+                    }
+                }
+            }
+            & .item:last-child {
+                margin-bottom: 10px;
+            }
+        }
+        & .list-item:hover {
+            overflow-y: auto;
+        }
+    }
+    & .ant-spin-nested-loading{
+        width: 100%;
+        height: 100%;
+
+        & .ant-spin-container {
+            width: 100%;
+            height: 100%;
+        }
+        & .ant-spin-spinning {
+            max-height: 100% !important;
+        }
+    }
+}

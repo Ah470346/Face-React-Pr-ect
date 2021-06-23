@@ -1,12 +1,15 @@
 import React from 'react';
 import {useDispatch} from 'react-redux';
-import { Form, Input, Button, Checkbox ,notification} from 'antd';
+import { Form, Input, Button ,notification} from 'antd';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser , faLock} from '@fortawesome/free-solid-svg-icons';
 import {userLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
 import {useHistory} from 'react-router-dom';
 import authApi from '../../api/authApi';
 import CheckNetwork from "../CheckNetwork";
+import Logo from "../../assets/VBPO.png";
+import {isMobile} from 'react-device-detect';
+import {Link} from "react-router-dom";
 function Login(props) {
     const history = useHistory();
     const dispatch = useDispatch();
@@ -24,7 +27,7 @@ function Login(props) {
     };
     const tailLayout = {
         wrapperCol: {
-            span: 24
+            span: 13
         },
     };
 
@@ -45,7 +48,13 @@ function Login(props) {
                 localStorage.setItem('permission',response);
                 setPermis({permission: response});
                 fetchFace();
-                history.push('/home'); 
+                if(response === "admin"){
+                    history.push('/home'); 
+                } else {
+                    history.push('/rtsp'); 
+                }
+                
+                
             }
         } catch (e) {
             if (e.response && e.response.data) {
@@ -55,8 +64,11 @@ function Login(props) {
               }
         }
     }
-    
 
+    const RedirectTest = () =>{
+        history.push('/'); 
+    }
+    
     const onFinish = (values) => {
         if(CheckNetwork()===false){
             notification.error({
@@ -75,9 +87,17 @@ function Login(props) {
         <div className='wrap-login'>
             <div className='login-content'>
                 <div className='login'>
+                    {isMobile === false && <div onClick={RedirectTest} className="test">
+                        <div className="test1">
+                            <div></div>
+                        </div>
+                        <p>TEST</p>
+                    </div>}
+                    <div className="logo">
+                        <img width='160' height='80' alt="" src={Logo}></img>
+                    </div>
                     <div className='title'>
-                        <p className='VBPO'>VBPO</p>
-                        <p className='singin-title'>Sign into your account</p>
+                        <p className='singin-title'>Login me</p>
                     </div>
                     <Form
                         {...layout}
@@ -91,7 +111,6 @@ function Login(props) {
                         size="large" 
                         >
                         <Form.Item
-                            label="Username"
                             name="username"
                             rules={[
                             {
@@ -102,12 +121,10 @@ function Login(props) {
                         >
                             <Input  
                                 className='user-input' 
-                                addonBefore={<FontAwesomeIcon icon={faUser}/>} 
-                                placeholder='Enter the username'/>
+                                addonAfter={<FontAwesomeIcon icon={faUser}/>} />
                         </Form.Item>
 
                         <Form.Item
-                            label="Password"
                             name="password"
                             rules={[
                             {
@@ -116,23 +133,20 @@ function Login(props) {
                             },
                             ]}
                         >
-                            <Input.Password  
-                                addonBefore={<FontAwesomeIcon icon={faLock}/>}  
-                                placeholder='Enter the password'/>
+                            <Input
+                                addonAfter={<FontAwesomeIcon icon={faLock}/>}  
+                                type="password"/>
                         </Form.Item>
 
-                        {/* <Form.Item {...tailLayout} name="remember" valuePropName="checked">
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item> */}
 
                         <Form.Item className="wrap-button" {...tailLayout}>
-                            <Button  danger shape="round" type="primary" htmlType="submit">
+                            <Button  danger type="primary" htmlType="submit">
                                 Login
                             </Button>
                         </Form.Item>
                     </Form>
                 </div>
-                <div className='image-bottom'></div>
+                {isMobile === true && <Link to="/" className="test-link">Test me</Link>}
             </div>
         </div>
     )

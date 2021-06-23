@@ -6,7 +6,7 @@ import Failed from '../../assets/failed.svg';
 import {useSelector} from 'react-redux';
 
 function TrainStatus({setShowModal,info,setInfo}) {
-    const faceDescriptions = useSelector(state=> state.faceDetect)
+    const faceDescriptions = useSelector(state=> state.faceDetect);
     return (
         <Modal
           title="Kết quả Training"
@@ -14,7 +14,7 @@ function TrainStatus({setShowModal,info,setInfo}) {
           closable={false}
           visible={true}
           onOk={() => {setShowModal(false); setInfo([])}}
-          onCancel={() => {setShowModal(false); setInfo([]); console.log('cancel');}}
+          cancelButtonProps ={{ style:{ display: 'none' }} }
           className='train-status'
           width='700px'
         >

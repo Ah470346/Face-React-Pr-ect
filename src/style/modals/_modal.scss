@@ -1,0 +1,17 @@
+@import './modalTrainStatus';
+.ant-modal-content{
+    p {
+        margin: 0;
+        font-size: 1.1em;
+    }
+    & .ant-modal-title {
+        font-weight: 800 !important;
+        font-size: 1.3em;
+    }
+    & .ant-modal-body {
+        padding-top: 15px;
+    }
+}
+@import './modalAddUser';
+@import './modalAddChannel';
+

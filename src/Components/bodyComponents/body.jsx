@@ -1,5 +1,5 @@
-import React, {useState  ,useRef,useEffect} from 'react';
-import { Button ,notification} from 'antd';
+import React, {useState ,useEffect} from 'react';
+import { Button ,notification,Input,Spin} from 'antd';
 import * as canvas from 'canvas';
 import {useSelector,useDispatch} from 'react-redux';
 import {fetchFaceDetect} from '../../Actions/actionCreators';
@@ -7,8 +7,15 @@ import * as faceapi from 'face-api.js';
 import InputFile from './InputFile';
 import TrainStatus from './trainStatus';
 import ListTrain from './listTrain';
-import {handlePlay} from './Recognition';
+import Channel from './channel';
 import CheckNetwork from "../CheckNetwork";
+import Home from '../../assets/home.svg';
+import HomeUnSelect from '../../assets/homeUnSelect.svg';
+import Screen from '../../assets/monitor.svg';
+import ScreenUnSelect from '../../assets/monitorUnSelect.svg';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faSearch,faPlus} from '@fortawesome/free-solid-svg-icons';
+
 
 const { Canvas, Image, ImageData } = canvas
 faceapi.env.monkeyPatch ({
@@ -25,28 +32,28 @@ function Body(props) {
     const dispatch = useDispatch();
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
     // spin load models
-    const [openCamVideo, setOpenCamVideo] = useState(false);
-    const [recognition, setRecognition] = useState(false);
     const [reload,setReload] = useState(false);
-    const [replay,setReplay] = useState(false);
+    const [spin,setSpin] = useState(false);
     const [showModal,setShowModal] = useState(false);
+    const [showModalInput,setShowModalInput] = useState(false);
     const [info,setInfo] = useState([]);
-    const [metadata,setMetadata] = useState("");
-    const elVideo = useRef();
+    const [filter,setFilter] = useState([]);
+    const [slideBar,setSlideBar]=useState("Home");
     const faceDescriptions = useSelector(state => state.faceDetect);
-    const permission = useSelector(state => state.permission);
-
-
-    // replay canvas when update train
-    if(faceDescriptions!== undefined && faceDescriptions.length!==0 && replay ===true){
-        const CurrentVideo = document.getElementsByTagName('video');
-        if(CurrentVideo.length !== 0){
-            handlePlay(elVideo);
+    const onChange = (value) => {
+        if(value.target.value !== "" ){
+            setFilter(filter.filter((i,index)=>{
+                return i.label.includes(value.target.value);
+            }));
+        } else {
+            setFilter([...faceDescriptions]);
         }
-        setReplay(false); 
-    }
+        
+    };
 
-    const streamCamVideo = (video) => {
+    const onHome = ()=>{
+        fetchFaceDetects();
+        setSpin(true);
         if(CheckNetwork()===false){
             notification.error({
                 message: 'Yêu cầu kết nối mạng !!!',
@@ -54,57 +61,31 @@ function Body(props) {
                   'Thiết bị của bạn chưa kết nối mạng',
             });
         } else{
-            fetchFaceDetects();
-            const constraints = {audio : false,video : true};
-            navigator.mediaDevices
-            .getUserMedia(constraints)
-            .then(function(mediaStream) {
-                setOpenCamVideo(true);
-                setRecognition(true);
-                video.current.srcObject = mediaStream;
-                video.current.onloadedmetadata = function(e) {
-                    video.current.play();
-                };
-            })
-            .catch(function(err) {
-                console.log(err.name + ": " + err.message);
-                if(err.name === "NotFoundError"){
-                    notification.error({
-                        message: 'Không tìm thấy thiết bị !!!',
-                        description:
-                        'Máy tính của bạn có thể không hỗ trợ webCam, chúng tôi không tìm thấy thiết bị',
-                    });
-                } else if(err.name === "NotAllowedError"){
-                    notification.error({
-                        message: 'Không được cấp phép truy cập !!!',
-                        description:
-                        'Hãy cấp phép cho website truy cập vào thiết bị của bạn!',
-                    });
-                }
-                
-            }); // always check for errors at the end.
-        }
-    }
-    const stop = (video) => {
-        if(video.current !==undefined && video.current !== null){
-            const stream = video.current.srcObject;
-            if(stream !== null){
-                const tracks = stream.getTracks();
-                const canvas = document.getElementsByTagName('canvas');
-                const wrapVideo = document.getElementById('wrap-video');
-                wrapVideo.removeChild(canvas[0])
-                tracks.forEach(function(track) {
-                    track.stop();
-                });
-
-                video.current.srcObject = null;
-                
-                setOpenCamVideo(false);
-                setRecognition(false);
-            }
-        }
+            setSlideBar("Home");
+        } 
+        setTimeout(()=>{
+            setSpin(false);
+        },500);
         
     }
+
+    const onChannel = ()=>{
+        fetchFaceDetects();
+        setSpin(true);
+        if(CheckNetwork()===false){
+            notification.error({
+                message: 'Yêu cầu kết nối mạng !!!',
+                description:
+                    'Thiết bị của bạn chưa kết nối mạng',
+            });
+        }else {
+            setSlideBar("Channel");
+        }
+        setTimeout(()=>{
+            setSpin(false);
+        },500)
+    }
+
     useEffect(()=>{
         const loadModal = ()=>{
             if(info.length !== 0){
@@ -113,49 +94,41 @@ function Body(props) {
         }
         loadModal();
     },[reload]);
+    useEffect(()=>{
+        setFilter([...faceDescriptions]);
+    },[faceDescriptions])
     return (
         <div className="wrap-body">
+            <Spin spinning={spin} wrapperClassName="body-spin">
             <div className="side-bar">
-                <div className='wrap-list-train'>
-                    <ListTrain></ListTrain>
+                <div className="home" onClick={onHome}>
+                    {slideBar === "Home" ? <img width="30"  height="30" src={Home} alt="" />
+                    : <img width="30"  height="30" src={HomeUnSelect} alt="" />}
+                    <p style={{color:slideBar === "Home" && "rgb(19, 19, 134)"}}>Home</p>
+                </div>
+                <div className="channel" onClick={onChannel}>
+                    {slideBar === "Channel" ? <img width="30"  height="30" src={Screen} alt="" />
+                    : <img width="30"  height="30" src={ScreenUnSelect} alt="" />}
+                    <p  style={{color:slideBar === "Channel" && "rgb(19, 19, 134)"}}>Channel</p>
                 </div>
             </div>
-            <div className='wrap-recognition'>
+            {slideBar === "Home" && 
+            <div className='wrap-content'>
+                <p>List Trains</p>
                 <div className='wrap-button'>
-                    {permission.permission === "admin" && <InputFile onClick={()=>stop(elVideo)} setReplay={setReplay} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>}
-                    {recognition === false
-                    ? (<Button onClick={()=> streamCamVideo(elVideo)} type='primary' danger>Face Recognition</Button>)
-                    : (<Button onClick={()=> stop(elVideo)} type='primary' danger>Stop WebCam</Button>)
-                    }   
+                    <Input className='search-folder' size='large' placeholder="Search" prefix={<FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>} onChange={onChange} />
+                    <Button onClick={()=> setShowModalInput(true)} className="add-user"><FontAwesomeIcon className="icon" icon={faPlus}></FontAwesomeIcon>ADD USER</Button>
                 </div>
-                <div id="wrap-video" className='wrap-video' >
-                    { openCamVideo === true&& (
-                    <>
-                        <video 
-                            playsInline autoPlay muted 
-                            type='video/mp4' width="720" height="560" id="video" 
-                            onPlay={()=>{handlePlay(faceDescriptions,metadata.videoWidth,metadata.videoHeight)}} 
-                            ref={elVideo} onLoadedMetadata={e => {
-                                setMetadata({
-                                  videoHeight: e.target.videoHeight,
-                                  videoWidth: e.target.videoWidth,
-                                  duration: e.target.duration
-                                });
-                              }}></video>
-                    </>
-                    )
-                    
-                    (<div className='signal'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" className="bi bi-play-circle" viewBox="0 0 16 16">
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                            <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
-                        </svg>
-                        <p>No Signal</p>
-                    </div>)
-                    }
+                <div className='wrap-list-train'>
+                    <ListTrain filter={filter}></ListTrain>
                 </div>
-            </div>
+            </div>}
+            {slideBar ==="Channel" &&
+                <Channel></Channel>
+            }
             {showModal === true && <TrainStatus info={info} setInfo={setInfo} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
+            {showModalInput === true && <InputFile setShow={setShowModalInput} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>}
+            </Spin>
         </div>
     )
 }

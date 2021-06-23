@@ -1,42 +1,53 @@
 import React , {useState} from 'react';
-import {notification,Tooltip,Spin} from 'antd';
+import {notification,Tooltip,Spin,Progress,Modal,Select} from 'antd';
 import {useSelector,useDispatch} from 'react-redux';
 import {fetchFaceDetect} from '../../Actions/actionCreators';
-import {useHistory} from 'react-router-dom';
 import {handleTrainImages} from "./Training";
 import shortID from 'shortid';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faFolderPlus} from '@fortawesome/free-solid-svg-icons';
 import recognitionApi from '../../api/recognitionApi';
 import ListRetrain from './listRetrain';
 import * as faceapi from 'face-api.js';
 import CheckNetwork from "../CheckNetwork";
 
+const { Option } = Select;
 
-function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
+function InputFile({setReload,reload,setInfo,setShow}) {
     const dispatch = useDispatch();
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
 
     //modal visible
     const [visible, setVisible] = useState(false);
     
-    const [trainLoading, setTrainLoading] = useState("Choose folder to train");
     const [spin, setSpin] = useState(false);
+    const [progress, setProgress] = useState(false);
+    const [percent, setPercent] = useState({number:1});
+    const [folderName, setFolderName] = useState("");
     const [dataUpLoad , setDataUpLoad] = useState([]);
+    const [dataTrain , setDataTrain] = useState([]);
+    const [channel , setChannel] = useState("");
 
-
-    const history = useHistory();
     const faceDescriptions = useSelector(state => state.faceDetect);
-    const status = useSelector(state => state.status);
+    const channels = useSelector(state => state.channel);
     //---------------------------------show modal retrain
     const [dataExist , setDataExist] = useState([]);
     const [dataNew , setDataNew] = useState([]);
-    
+
+    function handleChange(value) {
+        setChannel(value);
+        setVisible(false);
+    }
 
     const checkRetrain = (data) => {
         let arry1 =[];
         let arry2 =[];
+        const faceDetect = faceDescriptions.filter((i)=>{
+            return i.ChannelName === channel;
+        })
         //------------------------data exist
         for(let i of data){
-            for(let j of faceDescriptions){
+            for(let j of faceDetect){
                 if(i.label === j.label){
                     arry1.push(i);
                 }
@@ -57,6 +68,7 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
         }
         setDataExist(arry1);
         setDataNew(arry2);
+        setDataTrain([...arry1,...arry2].map((i)=> {return {...i,channel:channel}}));
     }
     //----------------------------------Convert image to base64
     function getBase64(file) {
@@ -85,9 +97,10 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
                   'Thiết bị của bạn chưa kết nối mạng',
             });
         } else{
-            onClick();
+            setVisible(false);
+            setDataExist([]);
+            setDataNew([]);    
             fetchFaceDetects();
-            setSpin(true);
             const files = Object.values(event.target.files);
             if(files.length >= 150){
                 notification.error({
@@ -135,6 +148,7 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
                         return;
                     }
                 }
+                setFolderName(str.slice(0,first-1));
                 if(dem === 1){
                     result1 = str.slice(0,first-1);
                 } else if(dem===2) {
@@ -177,18 +191,11 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
                   'Thiết bị của bạn chưa kết nối mạng',
             });
         } else{
-            if(data.length === 0){
-                notification.error({
-                    message: 'Chưa chọn folder training !!!',
-                });
-            } else {
-            setSpin(true);
-            setTrainLoading("Training....");
             Promise.all([
                 faceapi.nets.ssdMobilenetv1.load('/models')
             ]).then( async(res)=>{
                 const result = [];
-                const faceDetectPromise =  await handleTrainImages(data);
+                const faceDetectPromise =  await handleTrainImages(data,setProgress,setPercent,percent);
                 console.log(faceDetectPromise);
                 for(let i of faceDetectPromise[0]){
                     let a = await i ; 
@@ -198,10 +205,10 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
                             CheckedFaceDetects.push(i);
                         }
                     }
-                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects});
+                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName});
                 }
                 if(result.length === faceDetectPromise[0].length){
-                //push data to server
+                    //push data to server
                     for(let i = 0 ; i < result.length ; i++){
                         let array = [];
                         for(let e of result[i].faceDetects){
@@ -217,35 +224,79 @@ function InputFile({setReload,reload,setReplay,setInfo,onClick}) {
                     } 
                     setInfo(info);
                     //-----------------------------------------------------
-                    setSpin(false);
                     notification.success({
                         message: 'Train Hoàn Tất !!!',
                         description:
                             'Quá trình train hoàn tất !',
                     });
-                    setTrainLoading('Choose folder to train');
                     setReload(!reload);
-                    setReplay(true);
                     fetchFaceDetects();
                     checkRetrain(dataUpLoad);
+                    setShow(false);
                 }
             })
-            }
         }
+    }
+    const clickUpload = (event)=>{
+        if(channel ===""){
+            notification.error({
+                message: 'Channel chưa được chọn !!!',
+                description:
+                  'Bạn hãy chọn một channel',
+            });
+            event.preventDefault();
+        } else{}
     }
     return (
         <>
-            {dataNew.length === 1 && dataExist.length === 0 ? <></>:<ListRetrain 
-                dataExist={dataExist} handleTrain={handleTrain}  
-                dataNew={dataNew} setVisible={setVisible} visible={visible} ></ListRetrain>}
-            <div className='wrap-input'>
-                <Spin spinning={spin}>
-                    <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>
-                        <label htmlFor='train'>{trainLoading}</label>
-                    </Tooltip>
-                    <input onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
-                </Spin>
-            </div>
+            <Modal
+            title="Add User"
+            centered
+            visible={true}
+            okText="ADD"
+            onOk={()=>{
+                if(progress === true){}
+                else if(dataTrain.length!==0){handleTrain([...dataTrain]);setProgress(true)}
+                else {
+                    notification.error({
+                        message: 'Folder chưa được chọn !!!',
+                        description:
+                          'Bạn hãy chọn một folder',
+                    });
+                }}}
+            onCancel={()=>{if(progress === true){}else{setShow(false)}}}
+            className='input-modal'
+            width='1000px'
+            >
+                <div className="choose-channel">
+                    <p>Channel</p>
+                    <Select className="select" onChange={handleChange} defaultValue="Select a channel">
+                        {
+                            channels.map((i,index)=>{
+                                return(<Option value={i.ChannelName} key={index}>{i.ChannelName}</Option>)
+                            })
+                        }
+                    </Select>
+                </div>
+                <div className="choose-folder">
+                    <p>Folder</p>
+                    <div className='wrap-input'>
+                        <Spin spinning={spin}>
+                        <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>
+                            <label  htmlFor='train'><FontAwesomeIcon className="icon" icon={faFolderPlus}></FontAwesomeIcon>Select a folders</label>
+                        </Tooltip>
+                        </Spin>
+                        <input onClick={clickUpload} onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
+                        {visible === true && <p>{folderName}</p>}
+                    </div>
+                </div>
+                <ListRetrain 
+                dataExist={dataExist} handleTrain={handleTrain}  setDataTrain={setDataTrain}
+                dataNew={dataNew} setVisible={setVisible} visible={visible} dataTrain={dataTrain}></ListRetrain>
+                {progress === true && <div className="progress">
+                    <Progress percent={percent.number} />
+                </div>}
+            </Modal>
         </>
     )
 }
