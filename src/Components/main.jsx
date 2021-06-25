@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect} from 'react';
 import Header from './headerComponents/header';
 import Body from './bodyComponents/body';
 import Rtsp from './bodyComponents/RTSP/RtspCam';
@@ -12,6 +12,8 @@ import * as faceapi from 'face-api.js';
 import {isMobile} from 'react-device-detect';
 import CaptureMobile from './CaptureMobile';
 import CaptureDesktop from './CaptureDesktop';
+import Capture from './mobile/registerCapture';
+import Train from './mobile/registerTrains';
 
 function Main({fetchUser,status,fetchFaceDetect,permission,fetchChannel}) {
     useEffect(()=>{
@@ -50,10 +52,19 @@ function Main({fetchUser,status,fetchFaceDetect,permission,fetchChannel}) {
               :
               <Switch>
                 <Route exact path="/">
+                  <Header></Header>
                   <CaptureMobile></CaptureMobile>
                 </Route>
                 <Route exact path="/login">
                   <Login></Login>
+                </Route>
+                <Route exact path="/capture">
+                  <Header></Header>
+                  <Capture></Capture>
+                </Route>
+                <Route exact path="/train">
+                  <Header></Header>
+                  <Train></Train>
                 </Route>
               </Switch>
             }

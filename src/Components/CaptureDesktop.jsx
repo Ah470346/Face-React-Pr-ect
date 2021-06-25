@@ -26,9 +26,9 @@ function CaptureDesktop(props) {
 
     const handleChange = (value) =>{
         const arr = faceDescriptions.filter((i)=>{
-            console.log(i.ChannelName,value);
             return i.ChannelName === value;
         })
+        console.log(arr);
         setFaceDetectSelect(arr);
     }
 
@@ -59,7 +59,6 @@ function CaptureDesktop(props) {
 
 
     const streamCamVideo = (video) => {
-        console.log(faceDetectSelect);
         if(CheckNetwork()===false){
             notification.error({
                 message: 'Yêu cầu kết nối mạng !!!',
@@ -112,30 +111,25 @@ function CaptureDesktop(props) {
         } else{
             fetchFaceDetects();
             const tile = metadata.videoWidth/metadata.videoHeight;
-            console.log(metadata.videoWidth,metadata.videoHeight,vd.current.offsetWidth,vd.current.offsetHeight);
             let height ,width ;
             // width and height  của video đều nhỏ hơn ô chứa
             if(metadata.videoWidth < vd.current.offsetWidth && metadata.videoHeight < vd.current.offsetHeight){
-                console.log("1");
                 height = vd.current.offsetHeight;
                 width = vd.current.offsetHeight * tile + 2;
             }
             // width của video lớn hơn ô chứa và tỉ lệ width/height > 1
             else if(tile > 1 && metadata.videoWidth > vd.current.offsetWidth){
-                console.log("2");
                 height = vd.current.offsetWidth / tile;
                 width = vd.current.offsetWidth;
             } 
             // height của video lớn hơn ô chứa và tỉ lệ width/height < 1
             else if(tile < 1 && metadata.videoHeight > vd.current.offsetHeight){
-                console.log("3");
                 const t = metadata.videoHeight/metadata.videoWidth;
                 width = vd.current.offsetHeight/t;
                 height = vd.current.offsetHeight;
             }
             // height của video lớn hơn ô chứa, width nhỏ hơn ô chứa và tỉ lệ width/height > 1
             else if (tile > 1 && metadata.videoWidth < vd.current.offsetWidth){
-                console.log("4");
                 width = vd.current.offsetHeight * tile + 2;
                 height = vd.current.offsetHeight;
             }
@@ -168,16 +162,18 @@ function CaptureDesktop(props) {
             });
         } else{
         fetchFaceDetects()
-        startCam(elVideo);
-        var context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
-    
-        var data = canvas.toDataURL('image/png');
-        photo.setAttribute('src', data);
-        if(openCam === "1"){
-            setOpenCam("1");
-        } else {
-            setOpenCam("2");
+        if(openCam === "3"){
+            startCam(elVideo);
+            var context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        
+            var data = canvas.toDataURL('image/png');
+            photo.setAttribute('src', data);
+            if(openCam === "1"){
+                setOpenCam("1");
+            } else {
+                setOpenCam("2");
+            }
         }
       }
     }

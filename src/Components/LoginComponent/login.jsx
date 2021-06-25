@@ -1,6 +1,6 @@
 import React from 'react';
 import {useDispatch} from 'react-redux';
-import { Form, Input, Button ,notification} from 'antd';
+import { Form, Input, Button ,notification,Checkbox} from 'antd';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser , faLock} from '@fortawesome/free-solid-svg-icons';
 import {userLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
@@ -27,7 +27,7 @@ function Login(props) {
     };
     const tailLayout = {
         wrapperCol: {
-            span: 13
+            span: 24
         },
     };
 
@@ -48,7 +48,9 @@ function Login(props) {
                 localStorage.setItem('permission',response);
                 setPermis({permission: response});
                 fetchFace();
-                if(response === "admin"){
+                if(isMobile === true){
+                    history.push('/'); 
+                }else if(response === "admin"){
                     history.push('/home'); 
                 } else {
                     history.push('/rtsp'); 
@@ -134,13 +136,11 @@ function Login(props) {
                             ]}
                         >
                             <Input
-                                addonAfter={<FontAwesomeIcon icon={faLock}/>}  
+                                addonAfter={<FontAwesomeIcon icon={faLock}></FontAwesomeIcon>}  
                                 type="password"/>
                         </Form.Item>
-
-
                         <Form.Item className="wrap-button" {...tailLayout}>
-                            <Button  danger type="primary" htmlType="submit">
+                            <Button  className="button" danger type="primary" htmlType="submit">
                                 Login
                             </Button>
                         </Form.Item>

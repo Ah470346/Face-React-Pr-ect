@@ -4,6 +4,7 @@ import statusLoginReducer from './statusLoginReducer';
 import faceReducer from './facesReducer';
 import listRecognitionReducer from './listRecognition';
 import channelReducer from './channelReducer';
+import registerReducer from './registerReducer';
 
 const rootReducer = combineReducers({
     users: userReducer,
@@ -11,7 +12,8 @@ const rootReducer = combineReducers({
     faceDetect: faceReducer,
     permission: permissionReducer,
     listRecognition: listRecognitionReducer,
-    channel: channelReducer
+    channel: channelReducer,
+    register: registerReducer
 });
 
 export default rootReducer;

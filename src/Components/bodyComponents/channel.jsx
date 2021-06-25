@@ -120,7 +120,7 @@ function Channel(props) {
     }
     useEffect(()=>{
         fetchChannels();
-    },[]);
+    },[channels.length]);
     return (
         <div className="wrap-channel">
             <p>List Channels</p>

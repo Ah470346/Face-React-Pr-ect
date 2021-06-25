@@ -2,12 +2,14 @@ import React,{useState,useRef} from 'react';
 import { Button ,notification,Spin,Select} from 'antd';
 import {useSelector, useDispatch} from 'react-redux';
 import * as faceapi from 'face-api.js';
-import {fetchFaceDetect} from '../Actions/actionCreators';
+import {fetchFaceDetect,saveRegister} from '../Actions/actionCreators';
 import CheckNetwork from "./CheckNetwork";
+import {useHistory} from 'react-router-dom';
 
 const { Option } = Select;
 
 function CaptureMobile(props) {
+    const history = useHistory();
     const [openCam,setOpenCam] = useState("1");
     const elVideo = useRef();
     const [spin,setSpin] = useState(false);
@@ -15,9 +17,12 @@ function CaptureMobile(props) {
     const [size, setSize] = useState(null);
     const [faceDetectSelect, setFaceDetectSelect] = useState([]);
     const dispatch = useDispatch();
+    const [saveChannel, setSaveChannel] = useState("");
     const fetchFaceDetects = ()=> dispatch(fetchFaceDetect);
     const faceDescriptions = useSelector(state => state.faceDetect);
+    const permission = useSelector(state => state.permission);
     const channels = useSelector(state => state.channel);
+    const saveRegisters = (res)=> dispatch(saveRegister(res));
 
     let canvas , ctx,video ,photo;
     video = document.getElementById("video");
@@ -26,9 +31,9 @@ function CaptureMobile(props) {
 
     const handleChange = (value) =>{
         const arr = faceDescriptions.filter((i)=>{
-            console.log(i.ChannelName,value);
             return i.ChannelName === value;
         })
+        setSaveChannel(value);
         setFaceDetectSelect(arr);
     }
 
@@ -161,16 +166,19 @@ function CaptureMobile(props) {
             });
         } else{
             fetchFaceDetects();
-            startCam(elVideo);
-            var context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-        
-            var data = canvas.toDataURL('image/png');
-            photo.setAttribute('src', data);
-            if(openCam === "1"){
-                setOpenCam("1");
-            } else {
-                setOpenCam("2");
+            if(openCam === "3"){
+                startCam(elVideo);
+                console.log(canvas);
+                var context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            
+                var data = canvas.toDataURL('image/png');
+                photo.setAttribute('src', data);
+                if(openCam === "1"){
+                    setOpenCam("1");
+                } else {
+                    setOpenCam("2");
+                }
             }
         }
       }
@@ -250,9 +258,19 @@ function CaptureMobile(props) {
             },100);
         }
     }
+    const onNewRegister = () =>{
+        if(saveChannel === ""){
+            notification.error({
+                message:"Bạn Chưa Chọn Channel !!!"
+            });
+        } else {
+            saveRegisters({channel: saveChannel});
+            history.push("/capture");
+        }
+    }
     return (
-        <div className="wrap-capture">
-            <div className="wrap-video">
+        <div className="wrap-capture mobile">
+            <div className="wrap-video mobile">
                 <video 
                     ref={elVideo} 
                     playsInline autoPlay muted 
@@ -267,7 +285,7 @@ function CaptureMobile(props) {
                 <canvas id="canvas"></canvas>
                 <img id="image"/>
             </div>
-            <div className="wrap-button">  
+            <div className="wrap-button mobile">  
                 <Select onChange={handleChange} defaultValue="choose channel">
                     {
                         channels.map((i,index)=>{
@@ -285,6 +303,8 @@ function CaptureMobile(props) {
                 </Spin>}
                {/* <Button onClick={()=>stop(elVideo)} danger type="primary">Stop Cam</Button> */}
                <Button onClick={()=>clearPhoto()} type="primary">Clear</Button>
+               {permission.permission === "admin" &&
+                <Button onClick={onNewRegister} type="primary">New Register</Button>}
             </div>
             
         </div>

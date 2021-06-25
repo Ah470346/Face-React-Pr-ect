@@ -12,6 +12,7 @@ export const CHANGE_RECOGNITION = "CHANGE_RECOGNITION";
 export const DELETE_RECOGNITION = "DELETE_RECOGNITION";
 export const LOAD_CHANNEL = "LOAD_CHANNEL";
 export const POST_CHANNEL = "POST_CHANNEL";
+export const SAVE_REGISTER = "SAVE_REGISTER";
 
 
 
@@ -22,6 +23,12 @@ export const loadUser = (users) =>{
     }
 }
 
+export const saveRegister = (register) =>{
+    return {
+        type:SAVE_REGISTER,
+        data: register
+    }
+}
 
 export const postChannel = (channel) =>{
     return {

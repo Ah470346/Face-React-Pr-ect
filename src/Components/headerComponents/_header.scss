@@ -9,6 +9,10 @@
             margin: 0;
             padding-left: 40px;
             width: 20%;
+            img {
+                width: 110px;
+                height: 50px;
+            }
         }
 
         & .sign-in {
@@ -24,11 +28,45 @@
 @media all and (max-height:900px){
     .wrap-header {
         height: 7.5%;
+        & .VBPO-header{
+            & .header-brand {
+                padding-left: 10px;
+                img{
+                    width: 80px;
+                    height: 35px;
+                }
+            }
+
+            & .sign-in {
+                right: 10px;
+                img{
+                    width: 25px !important;
+                    height: 25px !important;
+                }
+            }
+        } 
     }
 }
 @media all and (max-height:780px){
     .wrap-header {
         height: 8%;
+        & .VBPO-header{
+            & .header-brand {
+                padding-left: 10px;
+                img{
+                    width: 70px;
+                    height: 30px;
+                }
+            }
+
+            & .sign-in {
+                right: 10px;
+                img{
+                    width: 20px !important;
+                    height: 20px !important;
+                }
+            }
+        } 
     }
 }
 @media all and (max-height:700px){

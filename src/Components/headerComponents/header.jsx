@@ -11,7 +11,6 @@ import {
 } from "react-router-dom";
 import {useSelector,useDispatch} from 'react-redux';
 import {clearLogin,fetchFaceDetect,setPermission} from '../../Actions/actionCreators';
-import {isMobile} from 'react-device-detect';
 import CheckNetwork from "../CheckNetwork";
 import {notification} from 'antd';
 import Login from '../../assets/login.svg';
@@ -44,10 +43,8 @@ function Header(props) {
         <div className='wrap-header'>
             <Navbar light expand="md" className='VBPO-header'>
                 <NavbarBrand className="header-brand" href="/">
-                    <img width='110' height='50' alt="" src={Logo}></img>
+                    <img alt="" src={Logo}></img>
                 </NavbarBrand>
-
-                { isMobile === false && <>
                 <Nav className="mr-auto sign-in" navbar>
                     <NavItem>
                         {
@@ -55,8 +52,7 @@ function Header(props) {
                             : <Link onClick={signOut} className='nav-link' to="/login"><img width="30px" height="30px"src={Logout}/>  Log out</Link>
                         }
                     </NavItem>
-                </Nav></>
-                }
+                </Nav>
             </Navbar>
         </div>
     )

@@ -1,4 +1,3 @@
-
 .wrap-channel {
     background-color: #f9f9f9;
     height: 100%;
@@ -62,4 +61,64 @@
             
         }
     }
+}
+@media all and (max-width:1600px){
+    .wrap-channel {
+        & .wrap-list{
+            & .list{
+                & li {
+                    padding: 15px 20px;
+                }
+            }
+        }
+       
+    }
+
+}
+
+@media all and (max-width:1352px){
+    .wrap-channel {
+        & .wrap-list{
+            & .list{
+                & li {
+                    padding: 15px 10px;
+                    & .add-channel-item {
+                        p {
+                            font-size: 1.4em;
+                        }
+                    }
+                    & .channel-item {
+                        p {
+                            font-size: 1.4em;
+                        }
+                    }
+                }
+            }
+        }
+       
+    }
+
+}
+@media all and (max-width:1200px){
+    .wrap-channel {
+        & .wrap-list{
+            & .list{
+                & li {
+                    padding: 15px 10px;
+                    & .add-channel-item {
+                        p {
+                            font-size: 1.2em;
+                        }
+                    }
+                    & .channel-item {
+                        p {
+                            font-size: 1.2em;
+                        }
+                    }
+                }
+            }
+        }
+       
+    }
+
 }
