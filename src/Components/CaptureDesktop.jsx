@@ -71,7 +71,7 @@ function CaptureDesktop(props) {
             });
         } else{
             fetchFaceDetects();
-            const constraints = {audio : false,video : true};
+            const constraints =  {audio : false,video : true};
             navigator.mediaDevices
             .getUserMedia(constraints)
             .then(function(mediaStream) {

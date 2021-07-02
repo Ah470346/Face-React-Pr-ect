@@ -268,26 +268,28 @@ function InputFile({setReload,reload,setInfo,setShow}) {
             className='input-modal'
             width='1000px'
             >
-                <div className="choose-channel">
-                    <p>Channel</p>
-                    <Select className="select" onChange={handleChange} defaultValue="Select a channel">
-                        {
-                            channels.map((i,index)=>{
-                                return(<Option value={i.ChannelName} key={index}>{i.ChannelName}</Option>)
-                            })
-                        }
-                    </Select>
-                </div>
-                <div className="choose-folder">
-                    <p>Folder</p>
-                    <div className='wrap-input'>
-                        <Spin spinning={spin}>
-                        <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>
-                            <label  htmlFor='train'><FontAwesomeIcon className="icon" icon={faFolderPlus}></FontAwesomeIcon>Select a folders</label>
-                        </Tooltip>
-                        </Spin>
-                        <input onClick={clickUpload} onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
-                        {visible === true && <p>{folderName}</p>}
+                <div className="wrap-content-input-modal">
+                    <div className="choose-channel">
+                        <p className="p-channel">Channel</p>
+                        <Select className="select" onChange={handleChange} defaultValue="Select a channel">
+                            {
+                                channels.map((i,index)=>{
+                                    return(<Option value={i.ChannelName} key={index}>{i.ChannelName}</Option>)
+                                })
+                            }
+                        </Select>
+                    </div>
+                    <div className="choose-folder">
+                        <p>Folder</p>
+                        <div className='wrap-input'>
+                            <Spin spinning={spin}>
+                            <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>
+                                <label  htmlFor='train'><FontAwesomeIcon className="icon" icon={faFolderPlus}></FontAwesomeIcon>Select a folders</label>
+                            </Tooltip>
+                            </Spin>
+                            <input onClick={clickUpload} onChange={handleUpLoad} id="train" type='file' directory="" webkitdirectory=""></input>
+                            {visible === true && <p>{folderName}</p>}
+                        </div>
                     </div>
                 </div>
                 <ListRetrain 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useEffect}from 'react';
 import {useDispatch} from 'react-redux';
 import { Form, Input, Button ,notification,Checkbox} from 'antd';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -82,9 +82,12 @@ function Login(props) {
             postAuth(values);
         }
     };
-    
     const onFinishFailed = (errorInfo) => {
     };
+    useEffect(()=>{
+        const wrapLogin = document.querySelector(".wrap-login");
+        wrapLogin.style.height = `${document.body.offsetHeight}px`;
+    },[]);
     return (
         <div className='wrap-login'>
             <div className='login-content'>

@@ -61,6 +61,9 @@ const ListRetrain = ({visible,dataExist,dataNew,setDataTrain,dataTrain}) => {
                         )
                     })
                 }
+            </div>
+            {dataExist.length !== 0 && dataNew.length !==0 && <hr />}
+            <div className='scroll-list'>
                 {
                     dataNew.length !==0 && dataNew.map((i,index)=>{
                         return( <div key={index} className="list-item-exist">

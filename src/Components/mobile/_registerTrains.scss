@@ -1,0 +1,71 @@
+.wrap-register-train{
+    width: 100%;
+    padding: 5px 10px 20px 10px;
+    height: 120%;
+    @include flexBox(column,flex-start,center);
+    & .wrap-channel-train {
+        width: 90%;
+        padding: 10px 0;
+        & p {
+            font-size: 1em;
+            margin: 0;
+        }
+
+    }
+
+    & .wrap-input-id {
+        width: 90%;
+        height: 50px;
+        margin-bottom: 10px;
+        @include flexBox(row,center,center);
+        input{
+            width: 100%;
+            height: 45px;
+        }
+    }
+
+    & .wrap-slide-image {
+        padding: 10px 5px 10px 5px;
+        width: 90%;
+        border: 1px solid rgba($color: #000000, $alpha: 0.5);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        & .each-slide {
+            position: relative;
+
+            & .delete {
+                position: absolute;
+                right: 15px;
+                top: 15px;
+            }
+            & .page-number{
+                position: absolute;
+                left: 12px;
+                top: 12px;
+                font-size: 1.1em;
+            }
+        }
+        & .react-slideshow-container {
+            position: relative;
+            & > img:first-child {
+                position: absolute;
+                left: 0;
+            }
+            & > img:last-child {
+                position: absolute;
+                right: 0;
+            }
+        }
+    }
+    & .nav-bar {
+        width: 90%;
+        @include flexBox(row,space-between,center);
+
+        & button {
+            width: 100px;
+            height: 40px;
+            font-size: 1em;
+            // @include flexBox(row,space-between,center);
+        }
+    }
+}

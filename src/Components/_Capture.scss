@@ -1,6 +1,6 @@
 & .wrap-capture {
     width: 100%;
-    height: 100%;
+    // height: 100%;
     padding: 30px 200px 0 200px;
     @include flexBox(column,flex-start,center);
 
@@ -8,7 +8,8 @@
         position: relative;
         order: 2;
         width: 100%;
-        height: 70%;
+        padding: 10px 10px;
+        height:380px;
         border: 1px solid rgba($color: #000000, $alpha: 0.3);
         border-radius: 20px;
         margin-top: 20px;

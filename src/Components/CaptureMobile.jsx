@@ -8,6 +8,38 @@ import {useHistory} from 'react-router-dom';
 
 const { Option } = Select;
 
+export const checkScreen = (width,height,vd) =>{
+    const tile = width/height;
+    let w ,h ;
+    // width and height  của video đều nhỏ hơn ô chứa
+    if(width < vd.current.offsetWidth && height < vd.current.offsetHeight){
+        h = height;
+        w = width;
+    }
+    // width của video lớn hơn ô chứa và tỉ lệ width/height > 1
+    else if(tile > 1 && width > vd.current.offsetWidth){
+        h = vd.current.offsetWidth / tile;
+        w = vd.current.offsetWidth;
+    } 
+    // height của video lớn hơn ô chứa và tỉ lệ width/height < 1
+    else if(tile < 1 && height > vd.current.offsetHeight){
+        const t = height/width;
+        w = vd.current.offsetHeight/t;
+        h = vd.current.offsetHeight;
+    }
+    // height của video lớn hơn ô chứa, width nhỏ hơn ô chứa và tỉ lệ width/height > 1
+    else if (tile > 1 && width < vd.current.offsetWidth){
+        w = vd.current.offsetHeight * tile;
+        h = vd.current.offsetHeight;
+    }
+    // width của video lớn hơn ô chứa, height nhỏ hơn ô chứa và tỉ lệ width/height < 1
+    else if (tile < 1 && height < vd.current.offsetHeight){
+        w = vd.current.offsetWidth;
+        h = vd.current.offsetWidth * tile;
+    }
+    return {width: w, height: h};
+}
+
 function CaptureMobile(props) {
     const history = useHistory();
     const [openCam,setOpenCam] = useState("1");
@@ -23,6 +55,7 @@ function CaptureMobile(props) {
     const permission = useSelector(state => state.permission);
     const channels = useSelector(state => state.channel);
     const saveRegisters = (res)=> dispatch(saveRegister(res));
+    const register = useSelector((state)=> state.register);
 
     let canvas , ctx,video ,photo;
     video = document.getElementById("video");
@@ -50,7 +83,10 @@ function CaptureMobile(props) {
     }
     const startCam = (video)=>{
         if(openCam!=="1" && openCam !== "2"){
-            const constraints = {audio : false,video : true};
+            const constraints = {audio : false,video :
+                {width: { min: 640, ideal: 1920, max: 1920 },
+                height: { min: 400, ideal: 1080 },
+                aspectRatio: 1.222222 }};
             navigator.mediaDevices
             .getUserMedia(constraints)
             .then(function(mediaStream) {
@@ -76,7 +112,10 @@ function CaptureMobile(props) {
             });
         } else{
             fetchFaceDetects();
-            const constraints = {audio : false,video : true};
+            const constraints = {audio : false,video :
+                {width: { min: 640, ideal: 1920, max: 1920 },
+                height: { min: 400, ideal: 1080 },
+                aspectRatio: 1.222222}};
             navigator.mediaDevices
             .getUserMedia(constraints)
             .then(function(mediaStream) {
@@ -115,34 +154,8 @@ function CaptureMobile(props) {
             });
         } else{
             fetchFaceDetects();
-            const tile = metadata.videoWidth/metadata.videoHeight;
-            let height ,width ;
-            // width and height  của video đều nhỏ hơn ô chứa
-            if(metadata.videoWidth < vd.current.offsetWidth && metadata.videoHeight < vd.current.offsetHeight){
-                height = metadata.videoHeight;
-                width = metadata.videoWidth;
-            }
-            // width của video lớn hơn ô chứa và tỉ lệ width/height > 1
-            else if(tile > 1 && metadata.videoWidth > vd.current.offsetWidth){
-                height = vd.current.offsetWidth / tile;
-                width = vd.current.offsetWidth;
-            } 
-            // height của video lớn hơn ô chứa và tỉ lệ width/height < 1
-            else if(tile < 1 && metadata.videoHeight > vd.current.offsetHeight){
-                const t = metadata.videoHeight/metadata.videoWidth;
-                width = vd.current.offsetHeight/t;
-                height = vd.current.offsetHeight;
-            }
-            // height của video lớn hơn ô chứa, width nhỏ hơn ô chứa và tỉ lệ width/height > 1
-            else if (tile > 1 && metadata.videoWidth < vd.current.offsetWidth){
-                width = vd.current.offsetHeight * tile;
-                height = vd.current.offsetHeight;
-            }
-            // width của video lớn hơn ô chứa, height nhỏ hơn ô chứa và tỉ lệ width/height < 1
-            else if (tile < 1 && metadata.videoHeight < vd.current.offsetHeight){
-                width = vd.current.offsetWidth;
-                height = vd.current.offsetWidth * tile;
-            }
+            const width = checkScreen(metadata.videoWidth,metadata.videoHeight,vd).width;
+            const height = checkScreen(metadata.videoWidth,metadata.videoHeight,vd).height;
             canvas.setAttribute('width',width);
             canvas.setAttribute('height', height);
             ctx = canvas.getContext('2d');
@@ -166,7 +179,7 @@ function CaptureMobile(props) {
             });
         } else{
             fetchFaceDetects();
-            if(openCam === "3"){
+            if(openCam === "4"){
                 startCam(elVideo);
                 console.log(canvas);
                 var context = canvas.getContext('2d');
@@ -244,6 +257,7 @@ function CaptureMobile(props) {
                         const box = resizeDetections[i].detection.box;
                         const drawBox = new faceapi.draw.DrawBox(box,{label: "unknown"});
                         setSpin(false);
+                        setOpenCam("4");
                         drawBox.draw(canvas);
                     })
                 } else if(faceMatcher.length !== 0){
@@ -252,6 +266,7 @@ function CaptureMobile(props) {
                         const box = resizeDetections[i].detection.box;
                         const drawBox = new faceapi.draw.DrawBox(box,{label: r.label});
                         setSpin(false);
+                        setOpenCam("4");
                         drawBox.draw(canvas);
                     })
                 }
@@ -263,8 +278,13 @@ function CaptureMobile(props) {
             notification.error({
                 message:"Bạn Chưa Chọn Channel !!!"
             });
-        } else {
+        }else if(register.images.length !== 0){
             saveRegisters({channel: saveChannel});
+            offCam(elVideo);
+            history.push("/train");
+        }else {
+            saveRegisters({channel: saveChannel});
+            offCam(elVideo);
             history.push("/capture");
         }
     }
@@ -301,8 +321,9 @@ function CaptureMobile(props) {
                             onClick={()=>handleImage(size.width,size.height,faceDescriptions,photo)} 
                             type="primary">Recognition</Button>
                 </Spin>}
+                { openCam === "4" && <Button onClick={()=>clearPhoto()} type="primary">Clear</Button>}
                {/* <Button onClick={()=>stop(elVideo)} danger type="primary">Stop Cam</Button> */}
-               <Button onClick={()=>clearPhoto()} type="primary">Clear</Button>
+               
                {permission.permission === "admin" &&
                 <Button onClick={onNewRegister} type="primary">New Register</Button>}
             </div>

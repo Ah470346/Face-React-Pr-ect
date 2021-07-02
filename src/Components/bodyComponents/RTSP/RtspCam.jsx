@@ -37,7 +37,7 @@ function RtspCam(props) {
             }
         }
         const arr = faceDescriptions.filter((i)=>{
-            return i.ChannelName === channelSelect;
+            return i.ChannelName === value;
         })
         setChannelSelect(value);
         setOpenCamVideo(true);
@@ -67,7 +67,7 @@ function RtspCam(props) {
             setRecognition(true); 
             setTimeout(()=>{
                 setOpacity("1");
-                // handlePlay(arr,addList,changeList,deleteItem);
+                handlePlay(arr,addList,changeList,deleteItem);
                 setOpenCamVideo(false);
             },1500)
         }

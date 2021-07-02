@@ -2,7 +2,9 @@ import {SAVE_REGISTER} from '../Actions/actionCreators';
 
 const initalState = {
     channel:"",
-    images:[]
+    images:[],
+    width:"",
+    height:""
 };
 
 const registerReducer = (state = initalState,action) => {

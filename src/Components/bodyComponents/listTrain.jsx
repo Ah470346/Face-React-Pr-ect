@@ -10,8 +10,13 @@ const ListTrain = ({filter}) => {;
                     filter.map((i,index)=>{
                         return(
                             <div key={index} className='list-item'>
-                                <FontAwesomeIcon className="icon" icon={faUser}></FontAwesomeIcon>
-                                <p>{i.label}</p>
+                                <div className="wrap-person">
+                                    <FontAwesomeIcon className="icon" icon={faUser}></FontAwesomeIcon>
+                                    <p>{i.label}</p>
+                                </div>
+                                <div className="wrap-channel-name">
+                                    <p>{i.ChannelName}</p>
+                                </div>
                             </div>
                         )
                     })   

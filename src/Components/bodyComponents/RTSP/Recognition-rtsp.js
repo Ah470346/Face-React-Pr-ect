@@ -20,34 +20,25 @@ const getTime = () =>{
     return {datetime , mili};
 }
 
-// const snapshot = (vd,canvas,width,height)=>{
-//     console.log('hello');
-//     var context = canvas.getContext('2d');
-//     context.drawImage(vd, 0, 0, width, height);
-
-//     var data = canvas.toDataURL('image/png');
-// }
-
 export const handlePlay = async (faceDescriptions,addList,changeList,deleteItem) =>{
     const img = document.getElementById('imgSocket');
-    if(img.getAttribute("alt")==="Loading..."){}
-    else{
-        const wrapVideo = document.getElementById('wrap-video');
-        const CurrentCanvas = document.getElementsByTagName('canvas');
-        const canvas = faceapi.createCanvas({width:img.offsetWidth-30,height:img.offsetHeight-30});
-        if(CurrentCanvas.length > 1){
-            wrapVideo.replaceChild(canvas,CurrentCanvas[1]);
-        } else{
-            wrapVideo.appendChild(canvas);
-        }
-        let faceMatcher = [];
-        if(faceDescriptions.length !== 0){
-            faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.4);
-        }
-        const displaySize = {width:620,height:480};
-        faceapi.matchDimensions(canvas,displaySize);
-        setInterval(async()=>{
-            console.log('hello');
+    const wrapVideo = document.getElementById('wrap-video');
+    const CurrentCanvas = document.getElementsByTagName('canvas');
+    const canvas = faceapi.createCanvas({width:img.offsetWidth-30,height:img.offsetHeight-30});
+    if(CurrentCanvas.length > 1){
+        wrapVideo.replaceChild(canvas,CurrentCanvas[1]);
+    } else{
+        wrapVideo.appendChild(canvas);
+    }
+    let faceMatcher = [];
+    if(faceDescriptions.length !== 0){
+        faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.42);
+    }
+    const displaySize = {width:520,height:480};
+    faceapi.matchDimensions(canvas,displaySize);
+    setInterval(async()=>{
+        if(img.getAttribute("alt")==="Loading..."){}
+        else {
             const list =  store.getState().listRecognition
             const detections = await faceapi.detectAllFaces(img,
                 new faceapi.TinyFaceDetectorOptions())
@@ -119,6 +110,6 @@ export const handlePlay = async (faceDescriptions,addList,changeList,deleteItem)
                     drawBox.draw(canvas);
                 })
             }
-        },1000);
-    }
+        }
+    },1000);
 }

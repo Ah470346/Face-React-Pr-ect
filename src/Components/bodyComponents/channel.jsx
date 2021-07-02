@@ -1,14 +1,13 @@
 import React,{useState,useEffect} from 'react';
 import Add from '../../assets/add.svg';
 import {useSelector,useDispatch} from 'react-redux';
-import {postChannel,fetchChannel} from '../../Actions/actionCreators';
-import {Modal,notification} from 'antd';
+import {fetchChannel} from '../../Actions/actionCreators';
+import {Modal,notification,Popconfirm} from 'antd';
 import channelAPI from '../../api/channelsApi';
 
 function Channel(props) {
     const dispatch = useDispatch();
     const channels = useSelector(state => state.channel);
-    const addChannel = (data) => dispatch(postChannel(data));
     const fetchChannels = () => dispatch(fetchChannel());
     const [addVisible,setAddVisible] = useState(false);
     const [editVisible,setEditVisible] = useState(false);
@@ -54,7 +53,7 @@ function Channel(props) {
         }
         return true;
     }
-    const onAdd = () =>{
+    const onAdd = async () =>{
         const data = {
             ChannelName: document.getElementById('input-channel-name').value,
             CameraIP:document.getElementById('input-ip-camera').value,
@@ -66,12 +65,19 @@ function Channel(props) {
                     message: checkChannelAdd(data)
                 })
             } else {
-                addChannel(data);
-                notification.success({
-                    message: "Thêm channel thành công !"
-                })
-                setAddVisible(false);
-                fetchChannels();
+                const response = await channelAPI.postChannel(data);
+                if(response){
+                    notification.success({
+                        message: "Thêm channel thành công !"
+                    })
+                    setAddVisible(false);
+                    fetchChannels();
+                }else {
+                    notification.error({
+                        message: "Thêm channel thất bại !"
+                    })
+                    setAddVisible(false);
+                }
             }
         }
     }
@@ -178,8 +184,12 @@ function Channel(props) {
             cancelButtonProps ={{ style:{ display: 'none' }} }
             className="channel-modal edit"
             footer={[
-            <button className="btn-save" key="1" onClick={()=>onEdit(selectChannel)}>Save</button>,
-            <button className="btn-delete" key="2" onClick={()=>onDelete(selectChannel)}>Delete</button>]}
+            <Popconfirm key="1" placement="top" title="Are you sure you want to save?" onConfirm={()=>onEdit(selectChannel)} okText="Yes" cancelText="No">
+                <button className="btn-save">Save</button>
+            </Popconfirm>,
+            <Popconfirm key="2" placement="top" title="Are you sure you want to delete?" onConfirm={()=>onDelete(selectChannel)} okText="Yes" cancelText="No">
+                <button className="btn-delete">Delete</button>
+            </Popconfirm>]}
             width="800px"
             >
                 <div className="wrap-content-modal">
