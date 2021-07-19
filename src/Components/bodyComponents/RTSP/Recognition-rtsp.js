@@ -8,7 +8,7 @@ const labeledDescriptors = (descriptions) => {
     });
 }
 
-const getTime = () =>{
+export const getTime = () =>{
     const time = new Date();
     const mili = time.getTime();
     let datetime = time.getDate() + "/"

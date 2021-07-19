@@ -3,8 +3,7 @@ import {SAVE_REGISTER} from '../Actions/actionCreators';
 const initalState = {
     channel:"",
     images:[],
-    width:"",
-    height:""
+    label:""
 };
 
 const registerReducer = (state = initalState,action) => {

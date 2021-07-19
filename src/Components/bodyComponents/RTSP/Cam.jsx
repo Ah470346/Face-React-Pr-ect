@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import socketIOClient from "socket.io-client";
-const ENDPOINT = "/";
+const ENDPOINT = "192.168.1.62:8080";
 
 
 

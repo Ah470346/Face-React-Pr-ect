@@ -22,6 +22,47 @@ html , body {
         }
     
     }
+    .ant-popover {
+        width: 330px;
+        height: 160px;
+        .ant-popover-content{
+            width: 100%;
+            height: 100%;
+            .ant-popover-arrow{
+                display: none;
+            }
+            .ant-popover-inner{
+                width: 100%;
+                height: 100%;
+                .ant-popover-inner-content{
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    .ant-popover-message{
+                        width: 100%;
+                        height: 48%;
+                        @include flexBox(row,center,center);
+                        span svg {
+                            display: none;
+                        }
+                        div {
+                            font-size: 1.3em;
+                        }
+                    }
+                    .ant-popover-buttons {
+                        width: 100%;
+                        height: 50%;
+                        @include flexBox(row,center,center);
+
+                        button {
+                            width: 70px;
+                            height: 35px
+                        }
+                    }
+                }
+            }
+        }
+    }
     @import './modals/modal';
     
 }

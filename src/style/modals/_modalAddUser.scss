@@ -1,4 +1,6 @@
 & .input-modal {
+    font-family: $fontFamilyNew;
+    font-size: 1.5em;
     position: relative;
     & .progress {
         position: absolute;
@@ -50,12 +52,12 @@
                 }
                 .ant-select-selection-item {
                     margin-top: 9px;
-                    
                 }
             }
         }
     }
     & .choose-folder{
+
         @include flexBox(row,flex-start,center);
         & > p {
             margin-right: 63px;
@@ -71,8 +73,8 @@
                 height: 50px;
                 @include flexBox(row,flex-start,center);
                 padding-left: 12px;
-                color: $colorTextBlur;
-                border: 1px solid rgba(0, 0, 0, 0.2);
+                color: #000;
+                border: 1px solid rgba(0, 0, 0, 0.3);
                 border-radius: 5px;
                 font-size: 1.1em;
                 transition: all 0.3s; 
@@ -101,7 +103,8 @@
         padding: 10px 30px 10px 40px;
         margin-top: 10px;
         border-top: 1px solid rgba(0, 0, 0, 0.1);
-        font-family: $fontFamily;
+        font-family: $fontFamilyNew;
+        font-size: 1.1em;
         & .list-title {
             font-size: 1.2em;
             margin-bottom: 10px;

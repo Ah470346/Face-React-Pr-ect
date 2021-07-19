@@ -10,6 +10,7 @@ import recognitionApi from '../../api/recognitionApi';
 import ListRetrain from './listRetrain';
 import * as faceapi from 'face-api.js';
 import CheckNetwork from "../CheckNetwork";
+import {getTime} from "./RTSP/Recognition-rtsp";
 
 const { Option } = Select;
 
@@ -196,7 +197,6 @@ function InputFile({setReload,reload,setInfo,setShow}) {
             ]).then( async(res)=>{
                 const result = [];
                 const faceDetectPromise =  await handleTrainImages(data,setProgress,setPercent,percent);
-                console.log(faceDetectPromise);
                 for(let i of faceDetectPromise[0]){
                     let a = await i ; 
                     let CheckedFaceDetects = [];// các ảnh đã được lọc , nếu không có khuôn mặt thì bỏ qua
@@ -205,7 +205,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                             CheckedFaceDetects.push(i);
                         }
                     }
-                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName});
+                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName,Time:getTime().datetime,Active: true, isDelete:false});
                 }
                 if(result.length === faceDetectPromise[0].length){
                     //push data to server
@@ -240,9 +240,9 @@ function InputFile({setReload,reload,setInfo,setShow}) {
     const clickUpload = (event)=>{
         if(channel ===""){
             notification.error({
-                message: 'Channel chưa được chọn !!!',
+                message: 'Channel not selected yet !!!',
                 description:
-                  'Bạn hãy chọn một channel',
+                  'Please choose a channel to train',
             });
             event.preventDefault();
         } else{}
@@ -253,7 +253,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
             title="Add User"
             centered
             visible={true}
-            okText="ADD"
+            okText="Train"
             onOk={()=>{
                 if(progress === true){}
                 else if(dataTrain.length!==0){handleTrain([...dataTrain]);setProgress(true)}

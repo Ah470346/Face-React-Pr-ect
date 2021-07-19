@@ -31,12 +31,12 @@ export const handleTrainImages = (data,setProgress,setPercent) =>{
                     let finalDetection;
                     for(let i of detections){
                         const area = i.alignedRect.box.width*i.alignedRect.box.height;
-                        if(area > max){
+                        if(area > max && i.alignedRect.score > 0.8){
                             finalDetection = i;
-                            max = area
+                            max = area;
                         }
                     }
-                    if(finalDetection.descriptor){
+                    if(finalDetection){
                         descriptions.push(finalDetection.descriptor);
                     }
                     setPercent({number:number(Math.round(percent/total*100))});

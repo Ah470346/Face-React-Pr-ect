@@ -19,7 +19,7 @@ export const handlePlay = (faceDescriptions,width,height) =>{
     }
     let faceMatcher = [];
     if(faceDescriptions.length !== 0){
-        faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.5);
+        faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.42);
     }
 
     const displaySize = {width,height};

@@ -117,7 +117,7 @@ export const fetchFaceDetect = () => async (dispatch) => {
             }
             return {...l,faceDetects: array};
         })
-        dispatch(loadFaceDetect(result));
+        dispatch(loadFaceDetect(result.filter((i)=> {return i.isDelete !== true} )));
     } catch (error) {
         console.log(error);
     }

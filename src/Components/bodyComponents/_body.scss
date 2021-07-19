@@ -29,6 +29,10 @@
         padding: 0;
         color: rgb(141, 137, 137);
     }
+    & .slide-right {
+        width: 5%;
+        background-color: #fff;
+    }
     & .side-bar{
         width: 20%;
         height:100%;
@@ -52,20 +56,56 @@
     & .wrap-content {
         background-color: #f9f9f9;
         height: 100%;
-        width: 80%;
+        width: 75%;
 
-        & > p {
-            height: 5%;
-            padding-left: 30px;
-            padding-top: 10px;
-            font-size: 1.3em;
-        }
         & .wrap-button {
             height: 10%;
             width: 100%;
             padding: 20px 70px 0px 30px;
             @include flexBox(row,space-between,center);
 
+            & > p {
+                font-size: 1.3em;
+            }
+            & .group-button {
+                & .button {
+                    position: relative;
+                    width: 180px;
+                    height: 50px;
+    
+                    .icon {
+                        position: absolute;
+                        left: 10px;
+                        top: 16px
+                    }
+                }
+                & .add-user {
+                    background-color: rgb(19, 19, 134);
+                    color: white;
+                    margin-right: 40px;
+                }
+                & .modify {
+                    border: 1px solid $colorBlue !important;
+                    color: $colorBlue;
+                }
+                & .modify:hover {
+                    opacity: 0.5;
+                }
+                & .add-user:hover{
+                    background-color: rgb(77, 77, 187) !important;
+                }
+            }
+            & button {
+                width: 220px;
+                height: 45px;
+                font-size: 1.1em;
+            }
+        }
+        & .wrap-search {
+            height: 10%;
+            @include flexBox(row,space-between,center);
+            padding: 20px 70px 0px 30px;
+            width: 100%;
             & .search-folder {
                 height: 50px;
                 width: 280px;
@@ -82,31 +122,31 @@
                     font-size: 1.3em;
                 }
             }
-            & .add-user {
-                position: relative;
-                background-color: rgb(19, 19, 134);
-                color: white;
-                width: 150px;
+            .ant-select {
+                width: 280px;
                 height: 50px;
-
-                .icon {
-                    position: absolute;
-                    left: 10px;
-                    top: 16px
+                font-size: 1.3em;
+                
+                .ant-select-selector {
+                    width: 100%;
+                    height: 100%;
+          
+                    .ant-select-selection-search {
+                        height: 100%;
+                        .ant-select-selection-search-input {
+                            height: 100%;
+                        }
+                    }
+                    .ant-select-selection-item {
+                        margin-top: 9px;
+                        
+                    }
                 }
-            }
-            & .add-user:hover{
-                background-color: rgb(77, 77, 187) !important;
-            }
-            & button {
-                width: 220px;
-                height: 45px;
-                font-size: 1.1em;
-            }
+             }
         }
         & .wrap-list-train {
             width: 100%;
-            height: 82%;
+            height: 76%;
             padding: 20px 20px 0px 30px;
     
             & .list-train{
@@ -122,27 +162,62 @@
                     overflow-y:scroll;
     
                     & .list-item {
-                        margin-top: 20px;
-                        @include flexBox(row,space-between, center);
-                        padding: 20px 20px;
+                        position: relative;
+                        margin-top: 15px;
+                        @include flexBox(row,flex-start, center);
+                        height: 75px;
+                        padding: 0px 20px;
                         border-radius: 10px;
+                        width: 100%;
                         border: 1px solid rgba($color: #000000, $alpha: 0.2);
                         cursor: pointer;
                         p {
-                            color: #1a1a1a;
+                            color: black;
                             font-size: 1.4em;
                             font-weight: 600;
                         }
                         & .wrap-person{
                             @include flexBox(row,flex-start, center);
+                            width: 20%;
                             .icon{
-                                margin-right: 40px;
+                                margin-right: 20px;
+                                width: 30px;
+                                height: 30px;
+                            }
+                        }
+                        & .wrap-time{
+                            width: 20%;
+                        }
+                        & .wrap-image {
+                            width: 7%;
+                            margin-right: 3%;
+                            @include flexBox(row,center, center);
+                            p {
+                                margin-right: 10px;
+                            }
+                            .icon{
                                 width: 30px;
                                 height: 30px;
                             }
                         }
                         & .wrap-channel-name {
+                            width: 48%;
                             padding: 0;
+                            p {
+                                font-size: 1.3em;
+                                width: 100%;
+                                text-align: center;
+                                word-wrap: break-word;  
+                            }
+                        }
+                        & .wrap-menu {
+                            position: absolute;
+                            right: 5px;
+                            top: 10px;
+                            .icon{
+                                width: 23px;
+                                height: 23px;
+                            }
                         }
 
                       

@@ -1,0 +1,219 @@
+.modify-modal {
+
+    & .modify-submit {
+        border: none;
+        background-color: $colorBlue;
+        width: 150px;
+        height: 40px;
+        margin-right: 20px;
+        color: white;
+        font-size: 1.1em;
+        transition: all ease 0.2s;
+        opacity: 1;
+        border-radius: 3px;
+    }
+    & .modify-submit:hover {
+        opacity: 0.7;
+    }
+    // remove border top footer
+    .ant-modal-footer {
+        border-top: none;
+    }
+    // button close 
+    .ant-modal-close {
+        width: 35px;
+        height: 35px;
+        .ant-modal-close-x{
+            width: 100%;
+            height: 100%;
+            line-height: 25px;
+        }
+    }
+    .ant-modal-body {
+        padding: 30px 30px 10px 30px;
+        line-height: 1;
+    }
+    & .wrap-transfer {
+        width: 100%;
+        height: 600px;
+
+        & .top-transfer {
+            height: 10%;
+            width: 46%;
+            @include flexBox(row,center,center);
+            & .button {
+                width: 49%;
+                height: 45px;
+                outline: none;
+                font-size: 1.1em;
+                transition: all ease 0.2s;
+                border: 2px solid rgba($color: #000000, $alpha: 0.3);
+                background-color: white;
+            }
+            & .button:hover {
+                border: 2px solid $colorBlue;
+                color: $colorBlue;
+                font-weight: 600;
+            }
+            & .button.move {
+                margin-right: 2%;
+            }
+        }
+        & .body-transfer {
+            height: 90%;
+            width: 100%;
+            @include flexBox(row);
+
+            & .left-column {
+                width: 46%;
+                height: 100%;
+                border: 1px solid rgba($color: #000000, $alpha: 0.15);
+            }
+            & .convert-column {
+                width: 8%;
+                height: 100%;
+                @include flexBox(column,center,center);
+
+                & button {
+                    @include flexBox(row,center,center);
+                    width: 40px;
+                    height: 40px;
+                }
+                & .left-to-right {
+                    margin-bottom: 5px;
+                }
+            }
+            & .right-column {
+                width: 46%;
+                height: 100%;
+                border: 1px solid rgba($color: #000000, $alpha: 0.2);
+            }
+
+            //select
+            & .top {
+                height: 12%;
+                padding: 10px 20px 10px 20px;
+                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+                
+                .ant-select {
+                    width: 100%;
+                    height: 100%;
+                    font-size: 1.2em;
+                    
+                    .ant-select-selector {
+                        width: 100%;
+                        height: 100%;
+                        // border-radius: 10px;
+              
+                        .ant-select-selection-search {
+                            height: 100%;
+                            .ant-select-selection-search-input {
+                                height: 100%;
+                            }
+                        }
+                        .ant-select-selection-item {
+                            margin-top: 4px;
+                        }
+                    }
+                }
+            }
+            & .body {
+                height: 88%;
+
+                & .search-body {
+                    width: 100%;
+                    height: 62px;
+                    padding: 10px 20px 10px 20px;
+                    input {
+                        font-size: 1.1em;
+                        height: 32px;
+                    }
+                    .ant-input-suffix svg {
+                        width: 18px;
+                        height: 18px;
+                    }
+                }
+                & .list-item {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                    overflow-y: auto;
+                    margin-right: 5px;
+                    margin-left: 5px;
+                    @include calc(height,"100% - 62px");
+                    .ant-checkbox-wrapper {
+                        margin: 0;
+                        width: 100%;
+                        font-size: 1.1em;
+                        padding: 10px 0px 10px 15px;
+                        transition: all ease 0.2s;
+                        background-color: white;
+                    }
+                    .ant-checkbox-wrapper:hover {
+                       background-color: #f0ebeb;
+                    }
+                    .check-all {
+                        @include flexBox(row,flex-end);
+                        line-height: 1.5715;
+                    }
+                    .ant-checkbox-group{
+                        width: 100%;
+                        .ant-checkbox-wrapper{
+                            @include flexBox(row,space-between);
+                            & > span:first-child {
+                                order: 2;
+                            }
+                            & > span:last-child {
+                                order: 0;
+                            }
+                        }
+                    }
+                    .ant-checkbox-wrapper-checked {
+                        background-color: #e6f7ff;
+                    }
+                }
+            }
+        }
+    }
+}
+.warning-modal {
+    & .warning-content {
+        font-size: 1.1em;
+        font-weight: bold;
+        text-align: center;
+    }
+    & .ant-modal-footer {
+        @include flexBox(row,center,center);
+
+        & .warning-btn {
+            border: none;
+            background-color: $colorBlue;
+            width: 100px;
+            height: 40px;
+            margin-right: 20px;
+            color: white;
+            font-size: 1.1em;
+            transition: all ease 0.2s;
+            opacity: 1;
+            border-radius: 3px;
+           
+        }
+        & .warning-btn:hover {
+            opacity: 0.7;
+        }
+        & .warning-btn:last-child {
+            margin-right:0px;
+        }
+        & .warning-btn.cancel{
+            background-color: white;
+            color: black;
+            transition: none;
+            border: 1px solid rgba($color: #000000, $alpha: 0.3);
+        }
+        & .warning-btn.cancel:hover {
+            border:  2px solid $colorBlue;
+            color: $colorBlue;
+            opacity: 1;
+        }
+    }
+}

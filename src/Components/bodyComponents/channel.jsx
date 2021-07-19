@@ -182,6 +182,7 @@ function Channel(props) {
             visible={editVisible}
             onCancel={()=>{setEditVisible(false)}}
             cancelButtonProps ={{ style:{ display: 'none' }} }
+            okButtonProps = {{ style:{ display: 'none' }} }
             className="channel-modal edit"
             footer={[
             <Popconfirm key="1" placement="top" title="Are you sure you want to save?" onConfirm={()=>onEdit(selectChannel)} okText="Yes" cancelText="No">

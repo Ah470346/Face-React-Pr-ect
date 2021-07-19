@@ -16,6 +16,7 @@ function RegisterCapture(props) {
     const saveRegisters = (res) => dispatch(saveRegister(res));
     const register = useSelector((state)=> state.register);
     const [metadata, setMetadata] = useState("");
+    const [screenOrientation, setScreenOrientation] = useState(false);
     const [count, setCount] = useState(2);
     const [cam, setCam] = useState("user");
     const elVideo = useRef(null);
@@ -25,6 +26,8 @@ function RegisterCapture(props) {
     video = document.getElementById("video1");
     canvas = document.getElementById("canvas1");
     // photo = document.getElementById("image1");
+
+    window.addEventListener("orientationchange", ()=>{setScreenOrientation(!screenOrientation);}, false);
 
     const offCam = (video)=>{
         const stream = video.current.srcObject;
@@ -75,15 +78,21 @@ function RegisterCapture(props) {
                 description:
                   'Thiết bị của bạn chưa kết nối mạng',
             });
-        } else{
+        } else if(screenOrientation === true){
+            notification.error({
+                message: 'Quay màn hình dọc để chụp ảnh!!!',
+                description:
+                  'Thiết bị của bạn đang ở chế độ màn hình ngang hãy quay dọc màn hình để chụp ảnh',
+            });
+        }else{
             const constraints = {audio : false,video :
                 {width: { min: 640, ideal: 1920, max: 1920 },
                 height: { min: 400, ideal: 1080 },
-                aspectRatio: 1.555555,
-                facingMode: cam}};
+                aspectRatio: 1.511111,
+                facingMode: cam} };
             navigator.mediaDevices
             .getUserMedia(constraints)
-            .then(function(mediaStream){
+            .then(function(mediaStream) {
                 setOpenCam("2");
                 video.current.srcObject = mediaStream;
                 video.current.onloadedmetadata = function(e) {
@@ -161,7 +170,6 @@ function RegisterCapture(props) {
             const nav = document.getElementById("nav");
             const navBg = document.getElementById("nav-bg");
             const width = checkScreen(metadata.videoWidth,metadata.videoHeight,elVideo).width;
-
             nav.style.width = `${width}px`;
             navBg.style.width = `${width}px`;
         }
@@ -192,7 +200,7 @@ function RegisterCapture(props) {
                 <canvas id="canvas1"></canvas>
                 {/* <img id="image1"/> */}
                 {openCam === "2" && <div id="nav" className="navigation-bar">
-                    <Link className="pre" to="/">
+                    <Link onClick={()=>offCam(elVideo)} className="pre" to="/">
                         <img src={Pre} alt="" />
                     </Link>
                         

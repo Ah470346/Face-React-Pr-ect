@@ -224,7 +224,7 @@ function CaptureDesktop(props) {
             ]).then(async()=>{
                 let faceMatcher = [];
                 if(faceDescriptions.length !== 0){
-                    faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.40);
+                    faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.42);
                 }
 
                 const displaySize = {width: width, height:height };

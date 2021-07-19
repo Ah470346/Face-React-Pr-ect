@@ -1,4 +1,4 @@
-import React,{useState,useRef} from 'react';
+import React,{useState,useRef,useEffect} from 'react';
 import { Button ,notification,Spin,Select} from 'antd';
 import {useSelector, useDispatch} from 'react-redux';
 import * as faceapi from 'face-api.js';
@@ -50,6 +50,7 @@ function CaptureMobile(props) {
     const [faceDetectSelect, setFaceDetectSelect] = useState([]);
     const dispatch = useDispatch();
     const [saveChannel, setSaveChannel] = useState("");
+    const [screenOrientation, setScreenOrientation] = useState(false);
     const fetchFaceDetects = ()=> dispatch(fetchFaceDetect);
     const faceDescriptions = useSelector(state => state.faceDetect);
     const permission = useSelector(state => state.permission);
@@ -62,6 +63,7 @@ function CaptureMobile(props) {
     canvas = document.getElementById("canvas");
     photo = document.getElementById("image");
 
+    window.addEventListener("orientationchange", ()=>{setScreenOrientation(!screenOrientation);}, false);
     const handleChange = (value) =>{
         const arr = faceDescriptions.filter((i)=>{
             return i.ChannelName === value;
@@ -98,7 +100,6 @@ function CaptureMobile(props) {
         }
     }
 
-
     const streamCamVideo = (video) => {
         if(CheckNetwork()===false){
             notification.error({
@@ -106,7 +107,14 @@ function CaptureMobile(props) {
                 description:
                   'Thiết bị của bạn chưa kết nối mạng',
             });
-        } else if(faceDetectSelect.length === 0){
+        } 
+        else if(screenOrientation === true) {
+            notification.error({
+                message: 'Quay màn hình dọc để test!!!',
+                description:
+                  'Thiết bị của bạn đang ở chế độ màn hình ngang hãy quay dọc màn hình để test',
+            });
+        }else if(faceDetectSelect.length === 0){
             notification.error({
                 message: 'Bạn chưa chọn channel hoặc channel không có dữ liệu !!!',
             });
@@ -240,13 +248,11 @@ function CaptureMobile(props) {
             setTimeout(async ()=>{
                 let faceMatcher = [];
                 if(faceDescriptions.length !== 0){
-                    faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.42);
+                    faceMatcher = new faceapi.FaceMatcher(labeledDescriptors(faceDescriptions),0.40);
                 }
 
                 const displaySize = {width: width, height:height };
                 faceapi.matchDimensions(canvas,displaySize);
-
-
 
                 const detections = await faceapi.detectAllFaces(image)
                     .withFaceLandmarks().withFaceDescriptors();
