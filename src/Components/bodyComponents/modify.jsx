@@ -46,7 +46,7 @@ function Modify({setShowModalModify}) {
         if(direction === "left"){
             setSelectChannel({...selectChannel,left: value});
             const list = faceDescriptions.filter((i)=>{
-                return i.ChannelName === value;
+                return i.ChannelName === value && i.Active !== false;
             });
             setPlainOptions({right:[],left:list.map((i)=> i.label)});
             setDefaultArray({...defaultArray,left:list.map((i)=> i.label)});
@@ -107,7 +107,7 @@ function Modify({setShowModalModify}) {
     const onConvert = (value,direction)=>{
         if(selectChannel.right === ""){
             notification.error({
-                message:"Bạn chưa chọn kênh cần chuyển !!!"
+                message:"You haven't selected the channel to change !!!"
             })
         } else {
             if(active === false){
@@ -242,13 +242,11 @@ function Modify({setShowModalModify}) {
             }
         } else if(active === false && defaultArray.right.length === 0){
             notification.error({
-                message:"Bạn chưa có dữ liệu để submit!!!",
-                description:"Hãy MOVE hoặc CLONE dữ liệu!!!"
+                message:"Please select data to submit!!!",
             });
         } else if(active === true && defaultArray.right.length === 0){
             notification.error({
-                message:"Bạn chưa có dữ liệu để submit!!!",
-                description:"Hãy MOVE hoặc CLONE dữ liệu!!!"
+                message:"Please select data to submit!!!",
             })
         }
     }
@@ -287,7 +285,7 @@ function Modify({setShowModalModify}) {
           onCancel={()=>setShowModalModify(false)}
           cancelButtonProps ={{ style:{ display: 'none' }} }
           className='modify-modal'
-          width='900px'
+          width='850px'
           footer={[
             <button onClick={()=> setVisibleConfirm(true)} className="modify-submit" key="1">Submit</button>
         ]}

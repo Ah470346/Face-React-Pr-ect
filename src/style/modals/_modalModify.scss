@@ -175,6 +175,11 @@
             }
         }
     }
+    @media all and (max-height:700px){
+        & .wrap-transfer {
+            height: 500px;
+        }
+    }
 }
 .warning-modal {
     & .warning-content {

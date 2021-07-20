@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Dropdown} from 'antd';
+import { Menu, Dropdown,notification} from 'antd';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUser,faImage,faEllipsisV,faCircle,faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 import recognitionApi from '../../api/recognitionApi';
@@ -11,9 +11,16 @@ const menu = (i) => {
     const red = "#f1422b";
     const onActive = async()=>{
         try {
-            const res = recognitionApi.editActiveRecognition({...i,Active: !i.Active });
-            if(res){
-                store.dispatch(fetchFaceDetect());
+            const res = await recognitionApi.editActiveRecognition({...i,Active: !i.Active });
+            store.dispatch(fetchFaceDetect());
+            if(res[0].Active === true){
+                notification.success({
+                    message:"Active successfully!!!"
+                })
+            } else {
+                notification.success({
+                    message:"Inactive successfully!!!"
+                })
             }
         } catch (error) {
             console.log(error);
@@ -21,8 +28,11 @@ const menu = (i) => {
     }
     const onDelete = async()=>{
         try {
-            const res = recognitionApi.deleteRecognition({...i,isDelete: true });
+            const res = await recognitionApi.deleteRecognition({...i,isDelete: true });
             if(res){
+                notification.success({
+                    message:"Delete successfully!!!"
+                })
                 store.dispatch(fetchFaceDetect());
             }
         } catch (error) {
@@ -65,7 +75,7 @@ const ListTrain = ({filter}) => {;
                                     <p>{i.ChannelName}</p>
                                 </div>
                                 <div className="wrap-menu">
-                                    <Dropdown overlay={menu(i)} placement="bottomRight">
+                                    <Dropdown trigger={['click']} overlay={menu(i)} placement="bottomRight">
                                         <FontAwesomeIcon className="icon" icon={faEllipsisV}></FontAwesomeIcon>
                                     </Dropdown>
                                 </div>

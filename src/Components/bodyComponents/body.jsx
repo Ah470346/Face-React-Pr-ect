@@ -148,7 +148,7 @@ function Body(props) {
                 </div>
                 <div className="wrap-search">
                     <Input className='search-folder' size='large' placeholder="Search" prefix={<FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>} onChange={onChange} />
-                    <Select onChange={handleChange} defaultValue="choose channel">
+                    <Select onChange={handleChange} defaultValue="All of channel">
                         <Option value={"All of channel"}>All of channel</Option>
                         {
                             channels.map((i,index)=>{
