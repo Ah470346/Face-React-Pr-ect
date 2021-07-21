@@ -35,7 +35,6 @@ function Body(props) {
     const fetchFaceDetects = () => dispatch(fetchFaceDetect());
     // spin load models
     const [reload,setReload] = useState(false);
-    const [spin,setSpin] = useState(false);
     const [showModal,setShowModal] = useState(false);
     const [showModalInput,setShowModalInput] = useState(false);
     const [showModalModify,setShowModalModify] = useState(false);
@@ -67,7 +66,6 @@ function Body(props) {
 
     const onHome = ()=>{
         fetchFaceDetects();
-        setSpin(true);
         if(CheckNetwork()===false){
             notification.error({
                 message: 'Yêu cầu kết nối mạng !!!',
@@ -77,15 +75,10 @@ function Body(props) {
         } else{
             setSlideBar("Home");
         } 
-        setTimeout(()=>{
-            setSpin(false);
-        },500);
-        
     }
 
     const onChannel = ()=>{
         fetchFaceDetects();
-        setSpin(true);
         if(CheckNetwork()===false){
             notification.error({
                 message: 'Yêu cầu kết nối mạng !!!',
@@ -95,9 +88,6 @@ function Body(props) {
         }else {
             setSlideBar("Channel");
         }
-        setTimeout(()=>{
-            setSpin(false);
-        },500)
     }
     useEffect(()=>{
         const loadModal = ()=>{
@@ -124,7 +114,6 @@ function Body(props) {
     },[faceDescriptions]);
     return (
         <div className="wrap-body">
-            <Spin spinning={spin} wrapperClassName="body-spin">
             <div className="side-bar">
                 <div className="home" onClick={onHome}>
                     {slideBar === "Home" ? <img width="30"  height="30" src={Home} alt="" />
@@ -168,7 +157,6 @@ function Body(props) {
             {showModal === true && <TrainStatus info={info} setInfo={setInfo} faceDetect={faceDescriptions} setShowModal={setShowModal}></TrainStatus>}
             {showModalInput === true && <InputFile setShow={setShowModalInput} setReload={setReload} reload={reload} setInfo={setInfo}></InputFile>}
             {showModalModify === true && <Modify setShowModalModify={setShowModalModify}></Modify>}
-            </Spin>
         </div>
     )
 }

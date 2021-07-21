@@ -60,7 +60,7 @@ function RtspCam(props) {
             });
         } else {
             const arr = faceDescriptions.filter((i)=>{
-                return i.ChannelName === channelSelect;
+                return i.ChannelName === channelSelect && i.Active !== false;
             })
             setOpenCamVideo(true);
             fetchFaceDetects();

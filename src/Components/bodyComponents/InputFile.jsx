@@ -205,7 +205,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                             CheckedFaceDetects.push(i);
                         }
                     }
-                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName,Time:getTime().datetime,Active: true, isDelete:false});
+                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName,Time:getTime().datetime,Active: true, isDelete:false,bestMatch:a.bestMatch});
                 }
                 if(result.length === faceDetectPromise[0].length){
                     //push data to server
@@ -220,7 +220,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                     //set information up load
                     const info = [];
                     for(let i of result){
-                        info.push({name: i.label, images: i.faceDetects.length, total: data.map((j)=>{if(i.label===j.label){return j.images.length}})});
+                        info.push({name: i.label, images: i.faceDetects.length, total: data.map((j)=>{if(i.label===j.label){return j.images.length}}),bestMatch:i.bestMatch});
                     } 
                     setInfo(info);
                     //-----------------------------------------------------
@@ -283,7 +283,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                         <p>Folder</p>
                         <div className='wrap-input'>
                             <Spin spinning={spin}>
-                            <Tooltip  placement="top" title='Lưu ý: Chỉ nhận upload folder và '>
+                            <Tooltip  placement="top" title='Note: Only received upload folder'>
                                 <label  htmlFor='train'><FontAwesomeIcon className="icon" icon={faFolderPlus}></FontAwesomeIcon>Select a folders</label>
                             </Tooltip>
                             </Spin>

@@ -37,6 +37,13 @@ function TrainStatus({setShowModal,info,setInfo}) {
                                 <p>{i.name}</p>
                             </div>
                             {
+                                success !== 0 && i.bestMatch.label !== "" && <div className="best-match">
+                                    <p style={{width:"90px"}}><b>≈ {i.bestMatch.label}</b></p>
+                                    <p style={(100-(i.bestMatch.distance*100).toFixed(2)) <= 50 ? {background:"rgb(11, 168, 63)",color:"white"} :{background:"rgb(241, 45, 11)",color:"white"}}>
+                                        ({(100-(i.bestMatch.distance*100)).toFixed(2)}%)</p>
+                                </div>
+                            }
+                            {
                                 success !== 0 ? <div className='status'>
                                     <p className='success'>{success}/{i.total}</p>
                                     <img src={Success} alt=""></img>

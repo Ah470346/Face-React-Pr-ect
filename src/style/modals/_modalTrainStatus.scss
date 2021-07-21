@@ -6,8 +6,17 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             padding: 10px;
             @include flexBox(row,space-between,center);
+
+            & .best-match {
+                width: 200px;
+                @include flexBox(row,flex-start,center);
+                p{
+                    padding: 2px 5px 2px 5px;
+                }
+            }
             & .wrap-folder {
-                @include flexBox(row,center,center);
+                width: 100px;
+                @include flexBox(row,flex-start,center);
 
                 img {
                     margin-right: 10px
