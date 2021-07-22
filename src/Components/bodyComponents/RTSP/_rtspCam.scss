@@ -137,6 +137,9 @@
 
                 & .wrap-label {
                     @include flexBox(row,flex-start,center);
+                    img {
+                        border-radius: 50%;
+                    }
                 }
                 & .wrap-p{
                     margin-left: 35px;

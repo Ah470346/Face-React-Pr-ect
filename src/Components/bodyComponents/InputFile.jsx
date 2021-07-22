@@ -11,6 +11,7 @@ import ListRetrain from './listRetrain';
 import * as faceapi from 'face-api.js';
 import CheckNetwork from "../CheckNetwork";
 import {getTime} from "./RTSP/Recognition-rtsp";
+import axios from 'axios';
 
 const { Option } = Select;
 
@@ -128,6 +129,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                 }
             }
             const array = [];
+            const arrayImage = [];
             const Labels = [];
             let first , last, dem = 0 , result1, result2 = ""; 
             for(let i = 0 ; i < filterFiles.length ; i++ ){
@@ -161,6 +163,16 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                         //-----------------------------------------Đây là chỗ cho file vào mảng (dễ sai)
                         return file.webkitRelativePath.includes(`${result1}/`);
                     })
+                    //cho image vào mảng 
+                    for(let file of filterFiles){
+                        if(file.webkitRelativePath.includes(`${result1}/`)){
+                            const data = new FormData();
+                            data.append('file', file);
+                            data.append('name', result1);
+                            arrayImage.push(data);
+                            break;
+                        }
+                    }
                     array.push(arr);
                     Labels.push(result1);
                 }
@@ -170,7 +182,7 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                 const a = array[index].map(async (e)=>{
                     return await getBase64(e);
                 })
-                return {label: i , images: a};
+                return {label: i , images: a,file: arrayImage[index]};
             })
             //-------------------------
             setSpin(true);
@@ -205,9 +217,10 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                             CheckedFaceDetects.push(i);
                         }
                     }
-                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName,Time:getTime().datetime,Active: true, isDelete:false,bestMatch:a.bestMatch});
+                    result.push({faceID: shortID.generate(),label: a.label, faceDetects: CheckedFaceDetects,ChannelName:a.ChannelName,Time:getTime().datetime,Active: true, isDelete:false,bestMatch:a.bestMatch,file:a.file});
                 }
                 if(result.length === faceDetectPromise[0].length){
+                    console.log(result);
                     //push data to server
                     for(let i = 0 ; i < result.length ; i++){
                         let array = [];
@@ -216,6 +229,8 @@ function InputFile({setReload,reload,setInfo,setShow}) {
                         }
                         await recognitionApi.postRecognition({...result[i],
                             faceDetects: array})
+                        result[i].file.append("ChannelName",result[i].ChannelName);
+                        await axios.post("/api/recognitions/upload", result[i].file,{});
                     }
                     //set information up load
                     const info = [];

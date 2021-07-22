@@ -72,6 +72,11 @@ function RtspCam(props) {
             },1500)
         }
     }
+    const loadAvatar = (label) =>{
+        return faceDescriptions.filter((i)=>{
+            return i.label === label && i.ChannelName === channelSelect;
+        })[0];
+    }
     return (
         <div className="wrap-body rtsp">
             <div className='wrap-recognition rtsp'>
@@ -99,7 +104,7 @@ function RtspCam(props) {
                             return(
                                 <div className="item" >
                                     <div className="wrap-label">
-                                        <img width="35" height="35" src={Profile} alt="" />
+                                        <img width="45" height="45" src={loadAvatar(i.label)} alt="" />
                                     </div>
                                     <div className="wrap-p">
                                         <p>{i.label}</p>

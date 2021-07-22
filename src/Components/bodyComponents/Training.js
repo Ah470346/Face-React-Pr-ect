@@ -65,9 +65,8 @@ export const handleTrainImages = (data,setProgress,setPercent) =>{
                     }
                 }
             }
-            console.log(bestMatch);
             faceDescriptions.push({label: label.label , faceDetects: descriptions,ChannelName:label.channel});
-            return {label: label.label , faceDetects: descriptions,ChannelName:label.channel,bestMatch:{...bestMatch}};
+            return {label: label.label , faceDetects: descriptions,ChannelName:label.channel,bestMatch:{...bestMatch},file:label.file};
         })
     ]);
 } 
