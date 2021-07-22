@@ -39,7 +39,7 @@ export const handlePlay = async (faceDescriptions,addList,changeList,deleteItem)
     setInterval(async()=>{
         if(img.getAttribute("alt")==="Loading..."){}
         else {
-            const list =  store.getState().listRecognition
+            const list =  store.getState().listRecognition;
             const detections = await faceapi.detectAllFaces(img,
                 new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks().withFaceDescriptors();
